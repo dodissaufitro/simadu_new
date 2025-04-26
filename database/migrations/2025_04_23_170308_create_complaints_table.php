@@ -17,14 +17,12 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('user_verified')->nullable()->constrained('users')->onDelete('cascade');
             $table->text('complaint');
-            $table->text('keteranga')->nullable();
             $table->text('photo1');
             $table->text('photo2')->nullable();
             $table->text('photo3')->nullable();
             $table->enum('status',['accept','finish','request','deny','re-schedule'])->nullable();
             $table->date('tanggal_eksekusi')->nullable();
             $table->text('keterangan')->nullable();
-
             $table->softDeletes();
             $table->timestamps();
         });

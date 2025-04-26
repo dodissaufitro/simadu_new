@@ -12,4 +12,17 @@ class Complaint extends Model
     protected $guarded = [
         'id',
     ];
+
+    public function Rusun()
+    {
+        return $this->belongsTo(Rusun::class);
+    }
+    public function User()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function UserVerified()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

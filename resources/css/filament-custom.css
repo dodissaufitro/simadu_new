@@ -1,0 +1,4 @@
+/* Ubah warna sidebar */
+.fi-sidebar {
+    background-color: #1f2937 !important; /* contoh: slate-800 */
+}

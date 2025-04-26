@@ -14,4 +14,17 @@ class Rusun extends Model
         'id',
     ];
 
+    public function User()
+    {
+        return $this->hasMany(User::class);
+    }
+    public function UserVerified()
+    {
+        return $this->hasMany(User::class);
+    }
+    public function Complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
 }

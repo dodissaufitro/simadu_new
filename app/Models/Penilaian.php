@@ -13,4 +13,12 @@ class Penilaian extends Model
     protected $guarded = [
         'id',
     ];
+    public function Complaint()
+    {
+        return $this->belongsTo(Complaint::class);
+    }
+    public function User()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
