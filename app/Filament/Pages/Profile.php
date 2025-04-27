@@ -14,9 +14,11 @@ class Profile extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static string $view = 'filament.pages.profile';
-    protected static ?string $title = 'Profil Saya';
-    protected static ?string $navigationLabel = 'Profil';
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $title = 'Profile';
+    // protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $navigationLabel = 'Profile';
+    protected static ?string $label = 'Profile';
 
     public User $record;
 

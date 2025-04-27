@@ -153,7 +153,7 @@ class ComplaintResource extends Resource
                 Tables\Columns\TextColumn::make('tanggal_eksekusi')
                     ->date()
                     ->sortable()
-                    ->searchable(isIndividual:true) ,
+                    ->searchable(isIndividual:true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
