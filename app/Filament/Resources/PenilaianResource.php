@@ -18,6 +18,9 @@ class PenilaianResource extends Resource
     protected static ?string $model = Penilaian::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
+    protected static ?string $navigationLabel = 'Feedback';
+
+    protected static ?string $title = 'Feedback';
 
     public static function form(Form $form): Form
     {

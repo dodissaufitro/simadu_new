@@ -18,6 +18,8 @@ class ComplaintResource extends Resource
     protected static ?string $model = Complaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+    protected static ?string $navigationLabel = 'Complaint';
+    protected static ?string $title = 'Complaint';
 
     public static function form(Form $form): Form
     {

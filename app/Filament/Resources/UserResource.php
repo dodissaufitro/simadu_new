@@ -4,9 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\lantai;
+use App\Models\Tower;
+use App\Models\Unit;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,29 +24,99 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationLabel = 'User';
+
+    protected static ?string $title = 'User';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('rusun_id')
-                    ->numeric(),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->columnSpanFull()
                     ->maxLength(255),
+                Section::make('Unit')
+                    ->description('Unit Yang Dihuni')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('rusun_id')
+                            ->relationship('rusun', 'name')
+                            ->dehydrated(false)
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function(Set $set){
+                                $set('tower_id',null);
+                                $set('lantai_id',null);
+                                $set('unit_id',null);
+                            })
+                            ->label('Rusun')
+                            ->required(),
+                        Forms\Components\Select::make('tower_id')
+                            // ->relationship('tower', 'name')
+                            ->options(
+                                fn(Get $get)=> Tower::query()->where('rusun_id',$get('rusun_id'))->pluck('name','id')
+                            )
+                            ->dehydrated(false)
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function(Set $set){
+                                $set('lantai_id',null);
+                                $set('unit_id',null);
+                            })
+                            ->label('Tower')
+                            ->required(),
+                        Forms\Components\Select::make('lantai_id')
+                            // ->relationship('lantai', 'name')
+                            ->options(
+                                fn(Get $get)=> lantai::query()->where('tower_id',$get('tower_id'))->pluck('name','id')
+                            )
+                            ->dehydrated(false)
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function(Set $set){
+                                $set('unit_id',null);
+                            })
+                            ->label('Lantai')
+                            ->required(),
+                        Forms\Components\Select::make('unit_id')
+                            // ->relationship('unit', 'name')
+                            ->options(
+                                fn(Get $get)=> Unit::query()->where('lantai_id',$get('lantai_id'))->pluck('name','id')
+                            )
+                            // ->dehydrated(false)
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->label('Unit')
+                            ->required(),
+                    ]),
+                // Forms\Components\TextInput::make('rusun_id')
+                //     ->relationship('rusun', 'name')
+                //     ->required()
+                //     ->dehydrated(false),
+                // Forms\Components\TextInput::make('unit_id')
+                //     ->relationship('unit', 'name')
+                //     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('address')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('phone')
-                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('phone')
+                    ->required(),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->required()
+                    ->default('user')
+
             ]);
     }
 
@@ -48,16 +124,17 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('rusun_id')
+                Tables\Columns\TextColumn::make('unit.lantai.tower.rusun.name')
+                    ->label('Rusun')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

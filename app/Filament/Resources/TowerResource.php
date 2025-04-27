@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RusunResource\Pages;
-use App\Filament\Resources\RusunResource\RelationManagers;
-use App\Models\Rusun;
+use App\Filament\Resources\TowerResource\Pages;
+use App\Filament\Resources\TowerResource\RelationManagers;
+use App\Models\Tower;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,25 +13,23 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class RusunResource extends Resource
+class TowerResource extends Resource
 {
-    protected static ?string $model = Rusun::class;
+    protected static ?string $model = Tower::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
-
-    protected static ?string $navigationLabel = 'Rusun';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationLabel = 'Tower';
     protected static ?string $navigationGroup = 'Rusun';
-    protected static ?int $navigationSort = 1;
-    protected static ?string $title = 'Rusun';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $title = 'Tower';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('rusun_id')
+                    ->numeric(),
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -41,9 +39,10 @@ class RusunResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rusun_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('address')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
@@ -84,10 +83,10 @@ class RusunResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRusuns::route('/'),
-            'create' => Pages\CreateRusun::route('/create'),
-            'view' => Pages\ViewRusun::route('/{record}'),
-            'edit' => Pages\EditRusun::route('/{record}/edit'),
+            'index' => Pages\ListTowers::route('/'),
+            'create' => Pages\CreateTower::route('/create'),
+            'view' => Pages\ViewTower::route('/{record}'),
+            'edit' => Pages\EditTower::route('/{record}/edit'),
         ];
     }
 

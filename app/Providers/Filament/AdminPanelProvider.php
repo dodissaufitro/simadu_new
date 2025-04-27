@@ -50,6 +50,12 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn () => route('filament.admin.pages.profile'))
                     ->icon('heroicon-o-user'),
             ])
+            ->navigationGroups([
+                'Main',
+                'Rusun',
+                'Filament Shield',
+
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

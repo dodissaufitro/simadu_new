@@ -5,33 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
-class Rusun extends Model
+class Unit extends Model
 {
+    /** @use HasFactory<\Database\Factories\UnitFactory> */
     use SoftDeletes,HasFactory;
 
     protected $guarded = [
         'id',
     ];
 
+    public function Lantai()
+    {
+        return $this->belongsTo(Lantai::class);
+    }
     public function User()
     {
         return $this->hasMany(User::class);
     }
-    public function UserVerified()
-    {
-        return $this->hasMany(User::class);
-    }
-    public function Complaints()
+    public function Complaint()
     {
         return $this->hasMany(Complaint::class);
     }
-
-    public function Towers()
-    {
-        return $this->hasMany(Tower::class);
-    }
-    
-
 }

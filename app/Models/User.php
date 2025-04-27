@@ -56,9 +56,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    public function rusun()
-    {
-        return $this->belongsTo(Rusun::class);
+    public function unit()    {
+        return $this->belongsTo(Unit::class);
     }
+    // {
+    //     return $this->belongsTo(Rusun::class);
+    // }
+
+    // public function rusun()
+    // {
+    //     return $this->belongsTo(Rusun::class);
+    // }
 }

@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rusuns', function (Blueprint $table) {
+        Schema::create('lantais', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('address');
+            $table->foreignId('tower_id')->nullable()->constrained('towers')->onDelete('cascade');
+            $table->string('name');
+
+            $table->unique(['tower_id','name']);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rusuns');
+        Schema::dropIfExists('lantais');
     }
 };

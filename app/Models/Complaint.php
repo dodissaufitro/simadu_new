@@ -17,6 +17,10 @@ class Complaint extends Model
     {
         return $this->belongsTo(Rusun::class);
     }
+    public function Unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
     public function User()
     {
         return $this->belongsTo(User::class);
@@ -25,4 +29,5 @@ class Complaint extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }
