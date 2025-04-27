@@ -30,7 +30,7 @@ class Profile extends Page
         return Infolist::make()
             ->record($this->record)
             ->schema([
-                Section::make('Informasi Pengguna')->schema([
+                Section::make('Profile Detail')->schema([
                     ImageEntry::make('photo')
                         ->label('Foto Profil')
                         ->defaultImageUrl(url('https://ui-avatars.com/api/?name=' . urlencode($this->record->name)))
@@ -38,11 +38,16 @@ class Profile extends Page
                     TextEntry::make('name')->label('Nama')->default($this->record->name??'-'),
                     TextEntry::make('email')->label('Email'),
                     TextEntry::make('phone')->label('No. Telepon')->default($this->record->phone??'-'),
-                    TextEntry::make('address')->label('Alamat')->default($this->record->address??'-'),
-                    TextEntry::make('rusun.name')->label('Rusun')
-                        ->default($this->record->rusun->name??'-')
-                        ->hidden(fn ($record) => $record->hasRole('')),
-                ])->columns(2),
+                    TextEntry::make('unit.lantai.tower.rusun.name')->label('Rusun')
+                        ->default($this->record->unit->lantai->tower->rusun->name??'-'),
+                    TextEntry::make('unit.lantai.tower.name')->label('Tower')
+                        ->default($this->record->unit->lantai->tower->name??'-'),
+                    TextEntry::make('unit.lantai.name')->label('Lantai')
+                        ->default($this->record->unit->lantai->name??'-'),
+                    TextEntry::make('unit.name')->label('Unit')
+                        ->default($this->record->unit->name??'-'),
+                    ])->columns(2),
+
             ]);
     }
 }

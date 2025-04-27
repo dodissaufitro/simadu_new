@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('towers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rusun_id')->nullable()->constrained('rusuns')->onDelete('cascade');
+            $table->foreignId('rusun_id')->constrained('rusuns')->onDelete('cascade');
             $table->string('name');
 
             $table->unique(['rusun_id','name']);

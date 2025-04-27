@@ -17,9 +17,8 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->numberBetween(1, 10),
-            'lantai_id' => \App\Models\lantai::factory(),
-
+            'name' => $this->faker->numberBetween(1, 100),
+            'lantai_id' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

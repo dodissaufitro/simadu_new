@@ -23,6 +23,8 @@ class RusunResource extends Resource
     protected static ?string $navigationGroup = 'Rusun';
     protected static ?int $navigationSort = 1;
     protected static ?string $title = 'Rusun';
+    protected static ?string $label = 'Rusun';
+    protected static ?string $pluralLabel = 'Rusun';
 
     public static function form(Form $form): Form
     {
@@ -41,10 +43,13 @@ class RusunResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

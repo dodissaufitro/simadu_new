@@ -2,9 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -24,24 +26,27 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            // 'name' => $this->faker->name(),
-            // 'email' => $this->faker->unique()->safeEmail(),
-            // 'email_verified_at' => now(),
-            // 'password' => static::$password ??= Hash::make('password'),
-            // 'phone' => $this->faker->phoneNumber(),
-            // 'unit_id' => \App\Models\Unit::factory(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique(true)->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'phone' => $this->faker->phoneNumber(),
+            'unit_id' => \App\Models\Unit::factory(),
             // 'roles' => 'user',
             // 'role' => $this->faker->randomElement(['admin', 'user']),
-            // 'remember_token' => Str::random(10),
+            'remember_token' => Str::random(10),
 
 
-            // 'name' => fake()->name(),
-            // 'email' => fake()->unique()->safeEmail(),
-            // 'email_verified_at' => now(),
-            // 'password' => static::$password ??= Hash::make('password'),
-            // 'remember_token' => Str::random(10),
 
         ];
+    }
+
+    public function withUserRole()
+    {
+        $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('user'); // Assign role "user" setelah user dibuat
+        });
     }
 
     /**

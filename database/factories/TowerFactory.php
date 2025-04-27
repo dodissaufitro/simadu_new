@@ -19,8 +19,8 @@ class TowerFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->randomElement(['Tower A', 'Tower B', 'Tower 1', 'Tower 2']),
-            'rusun_id' => \App\Models\Rusun::factory(),
+            'name' => $this->faker->randomElement(['Tower A', 'Tower B', 'Tower 1', 'Tower 2','Tower 3','Tower 4','Tower 5','Tower 6','Tower 7','Tower 8']),
+            'rusun_id' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

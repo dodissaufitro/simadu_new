@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 class Penilaian extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,HasFactory;
 
     protected $guarded = [
         'id',

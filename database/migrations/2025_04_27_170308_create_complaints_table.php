@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -13,14 +14,14 @@ return new class extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('user_verified')->nullable()->constrained('users')->onDelete('cascade');
             $table->text('complaint');
             $table->text('photo1');
             $table->text('photo2')->nullable();
             $table->text('photo3')->nullable();
-            $table->enum('status',['accept','finish','request','deny','re-schedule'])->nullable();
+            $table->enum('status',['accept','finish','request','deny','re-schedule'])->default('request');
             $table->date('tanggal_eksekusi')->nullable();
             $table->text('keterangan')->nullable();
             $table->softDeletes();

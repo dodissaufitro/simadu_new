@@ -39,8 +39,10 @@ class UnitResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('lantai_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
+                Tables\Columns\TextColumn::make('lantai.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),

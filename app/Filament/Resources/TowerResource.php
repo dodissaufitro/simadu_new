@@ -22,13 +22,18 @@ class TowerResource extends Resource
     protected static ?string $navigationGroup = 'Rusun';
     protected static ?int $navigationSort = 2;
     protected static ?string $title = 'Tower';
+    protected static ?string $label = 'Tower';
+    protected static ?string $pluralLabel = 'Tower';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('rusun_id')
-                    ->numeric(),
+                Forms\Components\Select::make('rusun_id')
+                    ->relationship('rusun', 'name')
+                    ->searchable() // mencari data
+                    ->preload() // mengambil data 5-10 data
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -39,7 +44,10 @@ class TowerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('rusun_id')
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
+                Tables\Columns\TextColumn::make('rusun.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')

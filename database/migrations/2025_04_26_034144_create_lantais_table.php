@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('lantais', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tower_id')->nullable()->constrained('towers')->onDelete('cascade');
+            $table->foreignId('tower_id')->constrained('towers')->onDelete('cascade');
             $table->string('name');
 
             $table->unique(['tower_id','name']);

@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -21,53 +22,123 @@ class PenilaianResource extends Resource
     protected static ?string $navigationLabel = 'Feedback';
 
     protected static ?string $title = 'Feedback';
+    protected static ?string $label = 'Feedback';
+    protected static ?string $pluralLabel = 'Feedback';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('complaint_id')
+                Forms\Components\Select::make('complaint_id')
+                    ->relationship('complaint', 'complaint')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_id')
+                    ->preload()
+                    ->searchable() // mencari data
+                    ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
+                    ->hidden(auth()->user()->hasRole('user')),
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('rating_layanan')
+                    ->preload()
+                    ->label('User Complaint')
+                    ->searchable() // mencari data
+                    ->default(auth()->user()->id)
+                    ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
+                    ->hidden(auth()->user()->hasRole('user')),
+                Forms\Components\Select::make('rating_layanan')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('rating_kualitas')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('rating_kecepatan')
-                    ->required()
-                    ->numeric(),
+                    ->options([
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                    ]),
+                Forms\Components\Select::make('rating_kualitas')
+                ->required()
+                ->options([
+                    1 => '⭐',
+                    2 => '⭐⭐',
+                    3 => '⭐⭐⭐',
+                    4 => '⭐⭐⭐⭐',
+                    5 => '⭐⭐⭐⭐⭐',
+                ]),
+                Forms\Components\Select::make('rating_kecepatan')
+                ->required()
+                ->options([
+                    1 => '⭐',
+                    2 => '⭐⭐',
+                    3 => '⭐⭐⭐',
+                    4 => '⭐⭐⭐⭐',
+                    5 => '⭐⭐⭐⭐⭐',
+                ]),
                 Forms\Components\Textarea::make('komentar')
                     ->columnSpanFull(),
-            ]);
+            ])
+            // ->afterValidate(function ($state, callable $set, callable $get) {
+            //     $exists = \App\Models\User::where('unit_id', $get('unit_id'))
+            //         ->where('role', $get('role'))
+            //         ->exists();
+
+            //     if ($exists) {
+            //         throw \Filament\Forms\Components\ComponentException::withMessages([
+            //             'unit_id' => 'Kombinasi Unit dan Role sudah ada.',
+            //             'role' => 'Kombinasi Unit dan Role sudah ada.',
+            //         ]);
+            //     }
+            // })
+            ;
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('complaint_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
+                Tables\Columns\TextColumn::make('complaint.complaint')
+                    ->sortable()
+                    ->limit(50,'...')
+                    ->searchable(isIndividual:true),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->sortable()
+                    ->searchable(isIndividual:true),
                 Tables\Columns\TextColumn::make('rating_layanan')
-                    ->numeric()
-                    ->sortable(),
+                ->formatStateUsing(function ($state) {
+                    return match ($state) {
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                        default => ' ',
+                    };
+                }),
+
                 Tables\Columns\TextColumn::make('rating_kualitas')
-                    ->numeric()
-                    ->sortable(),
+                ->formatStateUsing(function ($state) {
+                    return match ($state) {
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                        default => ' ',
+                    };
+                }),
+
                 Tables\Columns\TextColumn::make('rating_kecepatan')
-                    ->numeric()
-                    ->sortable(),
+                ->formatStateUsing(function ($state) {
+                    return match ($state) {
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                        default => ' ',
+                    };
+                }),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
@@ -85,8 +156,11 @@ class PenilaianResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -116,9 +190,18 @@ class PenilaianResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        // Mulai dengan query eloquent dasar
+        $query = parent::getEloquentQuery();
+
+        // Hilangkan global scope SoftDeletingScope
+        $query->withoutGlobalScopes([SoftDeletingScope::class]);
+
+        // Filter berdasarkan user_id, kecuali jika user adalah admin
+        if (!auth()->user()->hasRole('super_user')) {
+            $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
+        }
+
+        return $query; // Mengurutkan berdasarkan tanggal terbaru
+
     }
 }

@@ -17,10 +17,8 @@ class RusunFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->word(),
+            'name' => $this->faker->sentence(),
             'address' => $this->faker->address(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
     }
 }

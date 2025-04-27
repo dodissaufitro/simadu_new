@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\CountComplaintReport;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,6 +18,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -43,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 CountComplaintReport::class,
             ])
-
+            ->homeUrl(fn () => $this->getHomeUrl())
             ->userMenuItems([
                 UserMenuItem::make()
                     ->label('Profil Saya')
@@ -75,4 +77,15 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+    public function getHomeUrl(): string
+{
+    $user = Auth::user();
+
+    if ($user && !$user->hasRole('super_admin')) {
+        return route('filament.admin.pages.profile'); // Ganti 'profile' dengan route yang sesuai halaman profile kamu
+    }
+
+    return Filament::getUrl(); // Default ke dashboard
+}
 }

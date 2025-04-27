@@ -42,16 +42,21 @@ class UserResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\Select::make('rusun_id')
-                            ->relationship('rusun', 'name')
+                            ->options(
+                                fn(Get $get)=> \App\Models\Rusun::query()->pluck('name','id')
+                            )
+                            ->default(fn(?User $record) => $record?->unit?->lantai?->tower?->rusun?->id)
                             ->dehydrated(false)
                             ->searchable()
                             ->preload()
                             ->live()
+
                             ->afterStateUpdated(function(Set $set){
                                 $set('tower_id',null);
                                 $set('lantai_id',null);
                                 $set('unit_id',null);
                             })
+
                             ->label('Rusun')
                             ->required(),
                         Forms\Components\Select::make('tower_id')
@@ -59,6 +64,7 @@ class UserResource extends Resource
                             ->options(
                                 fn(Get $get)=> Tower::query()->where('rusun_id',$get('rusun_id'))->pluck('name','id')
                             )
+                            ->default(fn(?User $record) => $record?->unit?->lantai?->tower->id)
                             ->dehydrated(false)
                             ->searchable()
                             ->preload()
@@ -74,6 +80,7 @@ class UserResource extends Resource
                             ->options(
                                 fn(Get $get)=> lantai::query()->where('tower_id',$get('tower_id'))->pluck('name','id')
                             )
+                            ->default(fn(?User $record) => $record?->unit?->lantai?->id)
                             ->dehydrated(false)
                             ->searchable()
                             ->preload()
@@ -124,6 +131,9 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('unit.lantai.tower.rusun.name')
                     ->label('Rusun')
                     ->numeric()

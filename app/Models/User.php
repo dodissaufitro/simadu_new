@@ -59,6 +59,15 @@ class User extends Authenticatable
     public function unit()    {
         return $this->belongsTo(Unit::class);
     }
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+    public function complaints2()
+    {
+        return $this->hasMany(Complaint::class,'user_verified');
+    }
+
     // {
     //     return $this->belongsTo(Rusun::class);
     // }

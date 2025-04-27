@@ -39,7 +39,10 @@ class LantaiResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tower_id')
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->rowIndex(),
+                Tables\Columns\TextColumn::make('tower.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')

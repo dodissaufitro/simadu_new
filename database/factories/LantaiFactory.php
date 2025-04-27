@@ -18,8 +18,7 @@ class LantaiFactory extends Factory
     {
         return [
             'name' => $this->faker->numberBetween(1, 20),
-            'tower_id' => \App\Models\Tower::factory(),
-
+            'tower_id' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

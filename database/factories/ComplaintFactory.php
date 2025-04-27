@@ -28,7 +28,16 @@ class ComplaintFactory extends Factory
             // $table->date('tanggal_eksekusi')->nullable();
             // $table->text('keterangan')->nullable();
 
-            
+            'unit_id' => $this->faker->numberBetween(1, 10),
+            'user_id' => $this->faker->numberBetween(2, 5),
+            'user_verified' => $this->faker->numberBetween(2, 5),
+            'complaint' => $this->faker->sentence(),
+            'photo1' => $this->faker->imageUrl(),
+            'photo2' => $this->faker->imageUrl(),
+            'photo3' => $this->faker->imageUrl(),
+            'status' => $this->faker->randomElement(['accept', 'finish', 'request', 'deny', 're-schedule']),
+            'tanggal_eksekusi' => $this->faker->date(),
+            'keterangan' => $this->faker->sentence(),
         ];
     }
 }
