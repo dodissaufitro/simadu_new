@@ -25,25 +25,25 @@ class Complaint extends Model
                 $complaint->user_id = auth()->user()->id;
             }
             if (auth()->check() && auth()->user()->hasRole('petugas')) {
-                $complaint->unit_verified = auth()->user()->id;
+                $complaint->user_verified = auth()->user()->id;
             }
         });
 
         static::updating(function ($complaint) {
 
             if (auth()->check() && auth()->user()->hasRole('petugas')) {
-                $complaint->unit_verified = auth()->user()->id;
+                $complaint->user_verified = auth()->user()->id;
             }
 
-            if($complaint->status == 'finished') {
-                Penilaian::create([
-                    'complaint_id' => $complaint->id,
-                    'user_id' => $complaint->user_id,
-                    'rating_pelayanan' => $complaint->rating_pelayanan,
-                    'rating_kualitas' => $complaint->rating_kualitas,
-                    'rating_kecepatan' => $complaint->rating_kecepatan,
-                ]);
-            }
+            // if($complaint->status == 'finished') {
+            //     Penilaian::create([
+            //         'complaint_id' => $complaint->id,
+            //         'user_id' => $complaint->user_id,
+            //         'rating_pelayanan' => $complaint->rating_pelayanan,
+            //         'rating_kualitas' => $complaint->rating_kualitas,
+            //         'rating_kecepatan' => $complaint->rating_kecepatan,
+            //     ]);
+            // }
         });
     }
 

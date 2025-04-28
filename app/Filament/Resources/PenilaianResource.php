@@ -153,20 +153,20 @@ class PenilaianResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make()->hidden(!auth()->user()->hasRole('super_admin')),// jika bukan super admin
+                    Tables\Actions\DeleteAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
+                    Tables\Actions\ForceDeleteBulkAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
+                    Tables\Actions\RestoreBulkAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
                 ]),
             ]);
     }
@@ -197,7 +197,7 @@ class PenilaianResource extends Resource
         $query->withoutGlobalScopes([SoftDeletingScope::class]);
 
         // Filter berdasarkan user_id, kecuali jika user adalah admin
-        if (!auth()->user()->hasRole('super_user')) {
+        if (!auth()->user()->hasRole('super_admin')) {
             $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
 

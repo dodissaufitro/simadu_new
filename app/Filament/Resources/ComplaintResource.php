@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ComplaintResource\Pages;
 use App\Models\Complaint;
+use App\Models\Penilaian;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
@@ -69,7 +70,15 @@ class ComplaintResource extends Resource
                         'deny' => 'deny',
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
-                    ->hidden(auth()->user()->hasRole('user')),
+                    ->hidden(!auth()->user()->hasRole('super_admin')),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'accept' => 'accept',
+                        're-schedule' => 're-schedule',
+                        'deny' => 'deny',
+                    ])
+                    ->default(fn(?Complaint $record) => $record?->status ?? 'request')
+                    ->hidden(!auth()->user()->hasRole('petugas')),
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
                     ->minDate(now())
@@ -77,12 +86,14 @@ class ComplaintResource extends Resource
                     ->placeholder('Tanggal Eksekusi'),
                 Forms\Components\Textarea::make('complaint')
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->disabled(auth()->user()->hasRole('petugas')),
                 Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
+                    ->disabled(auth()->user()->hasRole('petugas'))
                     ->getUploadedFileNameForStorageUsing(function ($state) {
                         return str_replace('storage/', '', $state); // buang /storage/
                     })
@@ -91,10 +102,12 @@ class ComplaintResource extends Resource
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
+                    ->disabled(auth()->user()->hasRole('petugas'))
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('photo3')
                     ->image()
                     ->disk('public')
+                    ->disabled(auth()->user()->hasRole('petugas'))
                     ->directory('complaints')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('keterangan')
@@ -154,25 +167,91 @@ class ComplaintResource extends Resource
                     ->date()
                     ->sortable()
                     ->searchable(isIndividual:true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->hidden(!auth()->user()->hasRole('super_admin'))
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->hidden(!auth()->user()->hasRole('super_admin'))
-                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                 ->hidden(!auth()->user()->hasRole('super_admin')),
             ])
             ->actions([
+                Tables\Actions\Action::make('customModal')
+                    ->label(function (?Complaint $record) {
+                        if ($record?->status === 'finish') {
+                            return 'Finished';
+                        } elseif ($record?->status === 'accept') {
+                            return 'Finish';
+                        }
+                        return 'Not Finish';
+                    })
+                    ->button()
+                    ->color(function (?Complaint $record) {
+                        if (in_array($record?->status, ['accept', 'finish'])) {
+                            return 'success';
+                        }
+                        return 'danger';
+                    })
+                    ->disabled(fn(?Complaint $record) => $record->status !== 'accept')
+                    ->modalHeading('Confirmasi Complaint')
+                    ->modalSubheading('Update informasi kamu.')
+                    ->modalButton('Finish')
+
+                    ->form([
+                        Forms\Components\Select::make('rating_layanan')
+                            ->required()
+                            ->options([
+                                1 => '⭐',
+                                2 => '⭐⭐',
+                                3 => '⭐⭐⭐',
+                                4 => '⭐⭐⭐⭐',
+                                5 => '⭐⭐⭐⭐⭐',
+                            ]),
+                        Forms\Components\Select::make('rating_kualitas')
+                        ->required()
+                        ->options([
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                        ]),
+                        Forms\Components\Select::make('rating_kecepatan')
+                        ->required()
+                        ->options([
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                        ]),
+                        Forms\Components\Textarea::make('komentar')
+                            ->columnSpanFull(),
+
+                    ])
+                    ->action(function (array $data, ?Complaint $record) {
+                        $record->update([
+                            'status' => 'finish',
+                        ]);
+
+                        Penilaian::create([
+                            'complaint_id' => $record->id,
+                            'user_id' => $record->user_id,
+                            'rating_layanan' => $data['rating_layanan'],
+                            'rating_kualitas' => $data['rating_kualitas'],
+                            'rating_kecepatan' => $data['rating_kecepatan'],
+                            'komentar' => $data['komentar'],
+                        ]);
+                    }),
                 ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make()
+                    ,
+                    Tables\Actions\EditAction::make()
+                    // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
+                    ->hidden(function (?Complaint $record) {
+                        if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
+                            return true;
+                        }
+                        return false;
+                    }),
+
                 ]),
 
             ])
