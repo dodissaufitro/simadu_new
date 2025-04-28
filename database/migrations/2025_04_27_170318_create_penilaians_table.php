@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('rating_kualitas');
             $table->integer('rating_kecepatan');
             $table->text('komentar')->nullable();
-
+            $table->enum('status',['done','not done'])->default('not done');
             $table->softDeletes();
             $table->timestamps();
         });
