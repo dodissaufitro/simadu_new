@@ -10,6 +10,7 @@ class EditComplaint extends EditRecord
 {
     protected static string $resource = ComplaintResource::class;
 
+
     protected function getHeaderActions(): array
     {
         return [

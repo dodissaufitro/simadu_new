@@ -189,7 +189,16 @@ class ComplaintResource extends Resource
                         }
                         return 'danger';
                     })
-                    ->disabled(fn(?Complaint $record) => $record->status !== 'accept')
+                    ->disabled(function(?Complaint $record) {
+                        if (in_array($record?->status, ['accept', 'finish'])) {
+                            return true;
+                        }
+                        if (auth()->user()->hasRole('petugas')) {
+                            return true;
+                        }
+                        return false;
+
+                    })
                     ->modalHeading('Confirmasi Complaint')
                     ->modalSubheading('Update informasi kamu.')
                     ->modalButton('Finish')
