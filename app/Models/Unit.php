@@ -17,7 +17,7 @@ class Unit extends Model
 
     public function Lantai()
     {
-        return $this->belongsTo(Lantai::class);
+        return $this->belongsTo(lantai::class);
     }
     public function User()
     {

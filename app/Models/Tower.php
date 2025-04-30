@@ -21,7 +21,7 @@ class Tower extends Model
     }
     public function Lantai()
     {
-        return $this->hasMany(Lantai::class);
+        return $this->hasMany(lantai::class);
     }
 
 

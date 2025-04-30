@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LantaiResource\Pages;
 use App\Filament\Resources\LantaiResource\RelationManagers;
-use App\Models\Lantai;
+use App\Models\lantai as Lantai;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
