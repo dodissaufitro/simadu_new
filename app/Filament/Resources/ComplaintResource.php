@@ -90,28 +90,37 @@ class ComplaintResource extends Resource
                     ->required()
                     ->columnSpanFull()
                     ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj')),
-                Forms\Components\FileUpload::make('photo1')
+                    Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj'))
-                    ->getUploadedFileNameForStorageUsing(function ($state) {
-                        return str_replace('storage/', '', $state); // buang /storage/
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->getUploadedFileNameForStorageUsing(function ($file) {
+                        return uniqid() . '-' . $file->getClientOriginalName();
                     })
                     ->columnSpanFull(),
+
                 Forms\Components\FileUpload::make('photo2')
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj'))
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->getUploadedFileNameForStorageUsing(function ($file) {
+                        return uniqid() . '-' . $file->getClientOriginalName();
+                    })
                     ->columnSpanFull(),
+
                 Forms\Components\FileUpload::make('photo3')
                     ->image()
                     ->disk('public')
-                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj') )
                     ->directory('complaints')
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->getUploadedFileNameForStorageUsing(function ($file) {
+                        return uniqid() . '-' . $file->getClientOriginalName();
+                    })
                     ->columnSpanFull(),
+
                 Forms\Components\Textarea::make('keterangan')
                     ->hidden(auth()->user()->hasRole('user'))
                     ->columnSpanFull(),
