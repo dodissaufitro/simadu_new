@@ -24,9 +24,6 @@ class Complaint extends Model
                 $complaint->unit_id = auth()->user()->unit->id;
                 $complaint->user_id = auth()->user()->id;
             }
-            // if (auth()->check() && auth()->user()->hasRole('petugas')) {
-            //     $complaint->user_verified = auth()->user()->id;
-            // }
         });
 
         // static::updating(function ($complaint) {

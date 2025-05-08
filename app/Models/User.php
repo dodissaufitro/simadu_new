@@ -27,6 +27,18 @@ class User extends Authenticatable
     // ];
 
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (!$user->roles) {
+                $user->roles='user';
+            }
+        });
+    }
+
+
     protected $guarded = [
         'id',
     ];
