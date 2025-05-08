@@ -9,6 +9,7 @@ use App\Models\Tower;
 use App\Models\Unit;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -73,8 +74,7 @@ class UserResource extends Resource
                                 $set('lantai_id',null);
                                 $set('unit_id',null);
                             })
-                            ->label('Tower')
-                            ->required(),
+                            ->label('Tower'),
                         Forms\Components\Select::make('lantai_id')
                             // ->relationship('lantai', 'name')
                             ->options(
@@ -88,8 +88,7 @@ class UserResource extends Resource
                             ->afterStateUpdated(function(Set $set){
                                 $set('unit_id',null);
                             })
-                            ->label('Lantai')
-                            ->required(),
+                            ->label('Lantai'),
                         Forms\Components\Select::make('unit_id')
                             // ->relationship('unit', 'name')
                             ->options(
@@ -109,6 +108,11 @@ class UserResource extends Resource
                 // Forms\Components\TextInput::make('unit_id')
                 //     ->relationship('unit', 'name')
                 //     ->required(),
+                FileUpload::make('image')
+                ->image()
+                ->label('Foto Profil')
+                ->required()
+                ->columnSpanFull(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()

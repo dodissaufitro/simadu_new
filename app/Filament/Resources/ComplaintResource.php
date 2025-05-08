@@ -52,25 +52,27 @@ class ComplaintResource extends Resource
 
                     Forms\Components\Select::make('user_verified')
                     ->label('Verified by')
-                    ->options(\App\Models\User::pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
+                    ->options(\App\Models\User::whereHas('roles', function ($query) {
+                        $query->where('name', 'teknisi');
+                    })->pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::id())
                     ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
-                    ->hidden(!auth()->user()->hasRole('super_admin')), // hanya tampil kalau bukan user,
+                    ->hidden(!auth()->user()->hasRole('super_admin') || !auth()->user()->hasRole('teknisi') ),
                     Forms\Components\Select::make('user_id')
-                    ->label('User')
+                    ->label('Penghuni')
                     ->options(\App\Models\User::pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::user()->hasRole('tenknisi') ? Auth::user()->id : null) // jika user biasa, ambil ID user yang login
                     ->hidden(!auth()->user()->hasRole('super_admin')), // hanya tampil kalau bukan user,
                 Forms\Components\Select::make('status')
                     ->options([
                         'request' => 'request',
-                        'accept' => 'accept',
-                        'finish' => 'finish',
-                        're-schedule' => 're-schedule',
+                        // 'accept' => 'accept',
+                        // 'finish' => 'finish',
+                        // 're-schedule' => 're-schedule',
                         'deny' => 'deny',
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
-                    ->hidden(!auth()->user()->hasRole('super_admin')),
+                    ->hidden(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('user') ),
                 Forms\Components\Select::make('status')
                     ->options([
                         'accept' => 'accept',
