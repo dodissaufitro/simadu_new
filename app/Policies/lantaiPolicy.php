@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Lantai;
+use App\Models\lantai;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class LantaiPolicy
+class lantaiPolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class LantaiPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function view(User $user, Lantai $lantai): bool
+    public function view(User $user, lantai $lantai): bool
     {
         return $user->can('view_lantai');
     }
@@ -48,10 +48,10 @@ class LantaiPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function update(User $user, Lantai $lantai): bool
+    public function update(User $user, lantai $lantai): bool
     {
         return $user->can('update_lantai');
     }
@@ -60,10 +60,10 @@ class LantaiPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function delete(User $user, Lantai $lantai): bool
+    public function delete(User $user, lantai $lantai): bool
     {
         return $user->can('delete_lantai');
     }
@@ -83,10 +83,10 @@ class LantaiPolicy
      * Determine whether the user can permanently delete.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function forceDelete(User $user, Lantai $lantai): bool
+    public function forceDelete(User $user, lantai $lantai): bool
     {
         return $user->can('force_delete_lantai');
     }
@@ -106,10 +106,10 @@ class LantaiPolicy
      * Determine whether the user can restore.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function restore(User $user, Lantai $lantai): bool
+    public function restore(User $user, lantai $lantai): bool
     {
         return $user->can('restore_lantai');
     }
@@ -129,10 +129,10 @@ class LantaiPolicy
      * Determine whether the user can replicate.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Lantai  $lantai
+     * @param  \App\Models\lantai  $lantai
      * @return bool
      */
-    public function replicate(User $user, Lantai $lantai): bool
+    public function replicate(User $user, lantai $lantai): bool
     {
         return $user->can('replicate_lantai');
     }

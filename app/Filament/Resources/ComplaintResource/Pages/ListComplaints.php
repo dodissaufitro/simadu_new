@@ -13,7 +13,8 @@ class ListComplaints extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label('Tambah Complaint'),
+            Actions\CreateAction::make()->label('Tambah')
+            ->icon('heroicon-o-plus-circle'),
         ];
     }
 }

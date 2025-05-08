@@ -81,7 +81,7 @@ class UserResource extends Resource
                                 fn(Get $get)=> lantai::query()->where('tower_id',$get('tower_id'))->pluck('name','id')
                             )
                             ->default(fn(?User $record) => $record?->unit?->lantai?->id)
-                            ->dehydrated(false)
+                            // ->dehydrated(false)
                             ->searchable()
                             ->preload()
                             ->live()

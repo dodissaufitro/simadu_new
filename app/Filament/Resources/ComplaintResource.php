@@ -36,7 +36,7 @@ class ComplaintResource extends Resource
                 //     ->required()
                 //     ->dehydrated(false)
                 //     ->default(function (?Complaint $record) {
-                //         if (auth()->user()->hasRole('petugas')) {
+                //         if (auth()->user()->hasRole('tenknisi')) {
                 //             dd($record->unit);
                 //             return $record->unit->lantai->tower->rusun->address . ', ' .
                 //                 auth()->user()->unit->lantai->tower->name . ', ' .
@@ -59,7 +59,7 @@ class ComplaintResource extends Resource
                     Forms\Components\Select::make('user_id')
                     ->label('User')
                     ->options(\App\Models\User::pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
-                    ->default(Auth::user()->hasRole('petugas') ? Auth::user()->id : null) // jika user biasa, ambil ID user yang login
+                    ->default(Auth::user()->hasRole('tenknisi') ? Auth::user()->id : null) // jika user biasa, ambil ID user yang login
                     ->hidden(!auth()->user()->hasRole('super_admin')), // hanya tampil kalau bukan user,
                 Forms\Components\Select::make('status')
                     ->options([
@@ -78,7 +78,7 @@ class ComplaintResource extends Resource
                         'deny' => 'deny',
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
-                    ->hidden(!auth()->user()->hasRole('petugas')),
+                    ->hidden(!auth()->user()->hasRole('tenknisi')),
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
                     ->minDate(now())
@@ -87,13 +87,13 @@ class ComplaintResource extends Resource
                 Forms\Components\Textarea::make('complaint')
                     ->required()
                     ->columnSpanFull()
-                    ->disabled(auth()->user()->hasRole('petugas')),
+                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj')),
                 Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('petugas'))
+                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj'))
                     ->getUploadedFileNameForStorageUsing(function ($state) {
                         return str_replace('storage/', '', $state); // buang /storage/
                     })
@@ -102,12 +102,12 @@ class ComplaintResource extends Resource
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('petugas'))
+                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj'))
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('photo3')
                     ->image()
                     ->disk('public')
-                    ->disabled(auth()->user()->hasRole('petugas'))
+                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj') )
                     ->directory('complaints')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('keterangan')
@@ -193,7 +193,7 @@ class ComplaintResource extends Resource
                         if (in_array($record?->status, ['accept', 'finish'])) {
                             return true;
                         }
-                        if (auth()->user()->hasRole('petugas')) {
+                        if (auth()->user()->hasRole('tenknisi')) {
                             return true;
                         }
                         return false;
@@ -305,7 +305,7 @@ class ComplaintResource extends Resource
     if (auth()->user()->hasRole('user')) {
         $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
     }
-    if (auth()->user()->hasRole('Petugas')) {
+    if (auth()->user()->hasRole('tenknisi')) {
         $query->where('user_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
     }
 

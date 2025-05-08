@@ -31,14 +31,12 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'phone' => $this->faker->phoneNumber(),
-            'unit_id' => \App\Models\Unit::factory(),
+            'tower_id' => $this->faker->numberBetween(1,10),
+            'unit_id' => $this->faker->numberBetween(1,10),
+            // 'unit_id' => ,
             // 'roles' => 'user',
             // 'role' => $this->faker->randomElement(['admin', 'user']),
             'remember_token' => Str::random(10),
-
-
-
-
         ];
     }
 

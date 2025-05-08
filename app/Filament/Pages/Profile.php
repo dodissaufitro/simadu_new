@@ -33,9 +33,8 @@ class Profile extends Page
             ->record($this->record)
             ->schema([
                 Section::make('Profile Detail')->schema([
-                    ImageEntry::make('photo')
+                    ImageEntry::make('image')
                         ->label('Foto Profil')
-                        ->defaultImageUrl(url('https://ui-avatars.com/api/?name=' . urlencode($this->record->name)))
                         ->hiddenLabel(),
                     TextEntry::make('name')->label('Nama')->default($this->record->name??'-'),
                     TextEntry::make('email')->label('Email'),
@@ -49,7 +48,6 @@ class Profile extends Page
                     TextEntry::make('unit.name')->label('Unit')
                         ->default($this->record->unit->name??'-'),
                     ])->columns(2),
-
             ]);
     }
 }

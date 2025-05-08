@@ -33,13 +33,13 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        Rusun::factory(10)->create();
-        Tower::factory(10)->create();
+        Rusun::factory(15)->create();
+        Tower::factory(15)->create();
         lantai::factory(10)->create();
-        Unit::factory(10)->create();
-        User::factory(5)->create();
-        Complaint::factory(20)->create();
-        Penilaian::factory(20)->create();
+        Unit::factory(15)->create();
+        // User::factory(5)->create();
+        // Complaint::factory(20)->create();
+        // Penilaian::factory(20)->create();
 
 
     }

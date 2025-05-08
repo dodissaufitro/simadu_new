@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->text('image')->nullable();
+            $table->foreignId('tower_id')->nullable()->constrained('towers')->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('cascade');
             // $table->foreign('rusun_id')
             //     ->references('id')
