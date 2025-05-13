@@ -106,6 +106,7 @@ class PenilaianResource extends Resource
                     ->searchable(isIndividual:true),
                 Tables\Columns\TextColumn::make('verified.name')
                     ->label('Teknisi')
+                    ->hidden()
                     ->sortable()
                     ->searchable(isIndividual:true),
                 Tables\Columns\TextColumn::make('rating_layanan')
