@@ -159,6 +159,8 @@ class ComplaintResource extends Resource
                     ->limit(50)
                     ->wrap(),
                 Tables\Columns\ImageColumn::make('photo1')
+                ->label('Photo')
+                ->circular()
                  ,
                 // Tables\Columns\TextColumn::make('unit.name')
                 //     ->label('Rusun')
