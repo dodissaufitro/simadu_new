@@ -159,9 +159,7 @@ class ComplaintResource extends Resource
                     ->limit(50)
                     ->wrap(),
                 Tables\Columns\ImageColumn::make('photo1')
-                    ->disk('public')
-                    ->directory('complaints')
-                    ->circular(),
+                 ,
                 // Tables\Columns\TextColumn::make('unit.name')
                 //     ->label('Rusun')
                 //     ->formatStateUsing(function ($state, $record) {
