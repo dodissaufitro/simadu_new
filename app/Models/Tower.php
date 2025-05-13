@@ -23,6 +23,10 @@ class Tower extends Model
     {
         return $this->hasMany(lantai::class);
     }
+    public function User()
+    {
+        return $this->hasMany(User::class);
+    }
 
 
 }

@@ -32,6 +32,6 @@ class Rusun extends Model
     {
         return $this->hasMany(Tower::class);
     }
-    
+
 
 }

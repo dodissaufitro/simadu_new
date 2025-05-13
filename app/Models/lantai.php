@@ -23,4 +23,8 @@ class lantai extends Model
     {
         return $this->hasMany(Unit::class);
     }
+    public function User()
+    {
+        return $this->hasMany(User::class);
+    }
 }

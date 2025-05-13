@@ -21,4 +21,8 @@ class Penilaian extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function User_Verified()
+    {
+        return $this->hasMany(User::class);
+    }
 }

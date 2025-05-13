@@ -15,6 +15,7 @@ return new class extends Migration
             $table->text('image')->nullable();
             $table->foreignId('rusun_id')->nullable()->constrained('rusuns')->onDelete('cascade');
             $table->foreignId('tower_id')->nullable()->constrained('towers')->onDelete('cascade');
+            $table->foreignId('lantai_id')->nullable()->constrained('lantais')->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('cascade');
             // $table->foreign('rusun_id')
             //     ->references('id')

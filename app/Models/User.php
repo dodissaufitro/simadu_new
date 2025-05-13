@@ -76,6 +76,15 @@ class User extends Authenticatable
     public function unit()    {
         return $this->belongsTo(Unit::class);
     }
+    public function lantai()    {
+        return $this->belongsTo(lantai::class);
+    }
+    public function tower()    {
+        return $this->belongsTo(Tower::class);
+    }
+    public function rusun()    {
+        return $this->belongsTo(Rusun::class);
+    }
     public function complaints()
     {
         return $this->hasMany(Complaint::class);
