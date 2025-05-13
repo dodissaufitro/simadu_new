@@ -31,10 +31,15 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        static::creating(function ($user) {
-            if (!$user->roles) {
-                $user->roles='user';
-            }
+        // static::creating(function ($user) {
+        //     if (!$user->roles) {
+        //         $user->roles='user';
+        //     }
+        // });
+        static::created(function ($user) {
+            $user->assignRole('user');
+            // if (!$user->hasRoles()) {
+            // }
         });
     }
 

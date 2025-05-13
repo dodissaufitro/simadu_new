@@ -115,10 +115,11 @@ class ComplaintResource extends Resource
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->disabled(!auth()->user()->hasRole('teknisi'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
+                    ->hidden(auth()->user()->hasRole('user'))
                     ->columnSpanFull(),
 
                 Forms\Components\Textarea::make('keterangan')
@@ -317,8 +318,13 @@ class ComplaintResource extends Resource
         $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
     }
     if (auth()->user()->hasRole('tenknisi')) {
-        $query->where('user_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
+        $query->where('verify_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
     }
+    if (auth()->user()->hasRole('pj')) {
+        $query->leftJoin('');
+        $query->where('verify_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
+    }
+
 
     return $query->latest('created_at'); // Mengurutkan berdasarkan tanggal terbaru
 }
