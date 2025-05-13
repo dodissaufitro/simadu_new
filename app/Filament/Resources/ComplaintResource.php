@@ -161,7 +161,7 @@ class ComplaintResource extends Resource
                 Tables\Columns\ImageColumn::make('photo1')
                     ->disk('public')
                     ->directory('complaints')
-                    ->cirle(),
+                    ->circle(),
                 // Tables\Columns\TextColumn::make('unit.name')
                 //     ->label('Rusun')
                 //     ->formatStateUsing(function ($state, $record) {
