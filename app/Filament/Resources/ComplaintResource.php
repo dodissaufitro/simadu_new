@@ -185,6 +185,7 @@ class ComplaintResource extends Resource
                 ->color(fn (string $state): string => match ($state) {
                     'accept' => 'primary',
                     'finish' => 'success',
+                    'completed' => 'success',
                     'request' => 'gray',
                     're-schedule' => 'warning',
                     'deny' => 'danger',
@@ -205,8 +206,6 @@ class ComplaintResource extends Resource
                             return 'Finished';
                         } elseif ($record?->status === 'accept') {
                             return 'Finish';
-                        } elseif ($record?->status === 'completed') {
-                            return 'Completed';
                         }
                         return 'Not Finish';
                     })
@@ -268,7 +267,7 @@ class ComplaintResource extends Resource
                     ])
                     ->action(function (array $data, ?Complaint $record) {
                         $record->update([
-                            'status' => 'completed',
+                            'status' => 'done',
                         ]);
 
                         Penilaian::create([
@@ -294,6 +293,9 @@ class ComplaintResource extends Resource
                         //     return true;
                         // }
                         if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
+                            return true;
+                        }
+                        elseif ( $record?->status === 'completed') {
                             return true;
                         }
                         return false;
