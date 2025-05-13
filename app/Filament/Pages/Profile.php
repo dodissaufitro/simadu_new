@@ -38,7 +38,7 @@ class Profile extends Page
                         ->hiddenLabel()
                         ->height(100)
                         ->width(100)
-                        ->circle(),
+                        ->circular(),
                     TextEntry::make('name')->label('Nama')->default($this->record->name??'-'),
                     TextEntry::make('email')->label('Email'),
                     TextEntry::make('phone')->label('No. Telepon')->default($this->record->phone??'-'),
