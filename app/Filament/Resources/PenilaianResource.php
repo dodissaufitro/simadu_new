@@ -104,6 +104,9 @@ class PenilaianResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->sortable()
                     ->searchable(isIndividual:true),
+                Tables\Columns\TextColumn::make('user_verified.name')
+                    ->sortable()
+                    ->searchable(isIndividual:true),
                 Tables\Columns\TextColumn::make('rating_layanan')
                 ->formatStateUsing(function ($state) {
                     return match ($state) {

@@ -95,6 +95,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Complaint::class,'user_verified');
     }
+    public function penilaian()
+    {
+        return $this->hasMany(Penilaian::class,'user_verified');
+    }
 
     // {
     //     return $this->belongsTo(Rusun::class);
