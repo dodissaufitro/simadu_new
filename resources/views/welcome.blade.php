@@ -190,7 +190,7 @@
 <body>
     <div id="container">
         <img alt="Modern apartment building with clean lines and blue sky background" id="bg-image"
-            src="https://sirukim.jakarta.go.id/uploaded/repoimage/NFSJAxt3VKDyyXUz8r4KH3QceQI41joy.jpg" />
+            src="{{ asset('logo/bg_rusun.jpg') }}" />
         <div id="logos-left">
             <img alt="Logo Jakarta: official Jakarta city emblem in blue and yellow"
                 src="{{ asset('logo/logo_with_bg.jpg') }}" />
