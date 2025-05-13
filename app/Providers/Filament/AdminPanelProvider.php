@@ -29,8 +29,9 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandLogo('https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1200px-Coat_of_arms_of_Jakarta.svg.png')
-            ->brandLogoHeight('50px')
+            ->brandLogo(asset('logo/logo_simadu.png'))
+            // ->brandLogo
+            ->brandLogoHeight('80px')
             ->login()
             ->registration()
             ->colors([
@@ -45,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 CountComplaintReport::class,
             ])
-            ->homeUrl(fn () => $this->getHomeUrl())
+            // ->homeUrl(fn () => $this->getHomeUrl())
             ->userMenuItems([
                 UserMenuItem::make()
                     ->label('Profil Saya')
@@ -56,7 +57,6 @@ class AdminPanelProvider extends PanelProvider
                 'Main',
                 'Rusun',
                 'Filament Shield',
-
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -78,14 +78,14 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 
-    public function getHomeUrl(): string
-{
-    $user = Auth::user();
+//     public function getHomeUrl(): string
+// {
+//     $user = Auth::user();
 
-    if ($user && !$user->hasRole('super_admin')) {
-        return route('filament.admin.pages.profile'); // Ganti 'profile' dengan route yang sesuai halaman profile kamu
-    }
+//     if ($user && !$user->hasRole('super_admin')) {
+//         return route('filament.admin.pages.profile'); // Ganti 'profile' dengan route yang sesuai halaman profile kamu
+//     }
 
-    return Filament::getUrl(); // Default ke dashboard
-}
+//     return Filament::getUrl(); // Default ke dashboard
+// }
 }

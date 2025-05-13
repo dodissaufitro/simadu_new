@@ -197,8 +197,15 @@ class PenilaianResource extends Resource
         $query->withoutGlobalScopes([SoftDeletingScope::class]);
 
         // Filter berdasarkan user_id, kecuali jika user adalah admin
-        if (!auth()->user()->hasRole('super_admin')) {
+        if (auth()->user()->hasRole('teknisi')) {
+            $query->where('user_verified', auth()->user()->id); // Hanya data yang dimiliki user yang login
+        }
+        if (auth()->user()->hasRole('user')) {
             $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
+        }
+        if (auth()->user()->hasRole('koordinator')) {
+            $query->leftJoin('users','penilaian.user_id','=','id')->where('users.tower_id',auth()->user()->tower_id);
+            // $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
 
         return $query; // Mengurutkan berdasarkan tanggal terbaru

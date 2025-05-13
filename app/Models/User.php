@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -31,15 +33,15 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        // static::creating(function ($user) {
-        //     if (!$user->roles) {
-        //         $user->roles='user';
-        //     }
-        // });
+        static::creating(function ($user) {
+            if ($user->roles == "teknisi" ) {
+                $user->unit_id='';
+            }
+        });
         static::created(function ($user) {
-            $user->assignRole('user');
-            // if (!$user->hasRoles()) {
-            // }
+            if(!auth()->check()){
+                $user->assignRole('user');
+            }
         });
     }
 

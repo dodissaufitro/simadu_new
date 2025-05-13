@@ -27,11 +27,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@test.com',
-            'password' => bcrypt('password'),
-        ]);
+        // User::create([
+        //     'name' => 'Admin',
+        //     'email' => 'admin@test.com',
+        //     'password' => bcrypt('password'),
+        // ]);
 
         Rusun::factory(15)->create();
         Tower::factory(15)->create();

@@ -58,7 +58,7 @@
             border-radius: 10px;
             box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.2);
             font-size: 2rem;
-            max-width: 90%;
+            max-width: 100%;
             margin-bottom: 6rem;
             background-color: rgba(255, 255, 255, 0.904);
             backdrop-filter: blur(100px);
@@ -193,12 +193,12 @@
             src="https://sirukim.jakarta.go.id/uploaded/repoimage/NFSJAxt3VKDyyXUz8r4KH3QceQI41joy.jpg" />
         <div id="logos-left">
             <img alt="Logo Jakarta: official Jakarta city emblem in blue and yellow"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1200px-Coat_of_arms_of_Jakarta.svg.png" />
+                src="{{ asset('logo/logo_with_bg.jpg') }}" />
             <img alt="Logo house icon in orange circle"
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1200px-Coat_of_arms_of_Jakarta.svg.png" />
         </div>
         <img alt="Logo black and white rectangular logo with text" id="logo-right"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1200px-Coat_of_arms_of_Jakarta.svg.png" />
+            src="{{ asset('logo/logo_with_bg.jpg') }}" />
 
         <div id="content">
             <p class="">

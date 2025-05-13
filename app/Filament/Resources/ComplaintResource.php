@@ -8,6 +8,7 @@ use App\Models\Penilaian;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -57,7 +58,8 @@ class ComplaintResource extends Resource
                     })->pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::id())
                     ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
-                    ->hidden(!auth()->user()->hasRole('super_admin') || !auth()->user()->hasRole('teknisi') ),
+                    ->hidden(auth()->user()->hasRole('teknisi') ),
+
                     Forms\Components\Select::make('user_id')
                     ->label('Penghuni')
                     ->options(\App\Models\User::pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
@@ -65,8 +67,8 @@ class ComplaintResource extends Resource
                     ->hidden(!auth()->user()->hasRole('super_admin')), // hanya tampil kalau bukan user,
                 Forms\Components\Select::make('status')
                     ->options([
-                        'request' => 'request',
-                        // 'accept' => 'accept',
+                        // KOOR
+                        'accept' => 'accept',
                         // 'finish' => 'finish',
                         // 're-schedule' => 're-schedule',
                         'deny' => 'deny',
@@ -75,12 +77,20 @@ class ComplaintResource extends Resource
                     ->hidden(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('user') ),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'accept' => 'accept',
-                        're-schedule' => 're-schedule',
-                        'deny' => 'deny',
+                        // 'request' => 'request',
+                        'finish' => 'finish',
+                        // 'finish' => 'finish',
+                        're-schedule' => 're-schedule'
                     ])
-                    ->default(fn(?Complaint $record) => $record?->status ?? 'request')
-                    ->hidden(!auth()->user()->hasRole('tenknisi')),
+                    ->default(fn(?Complaint $record) => $record?->status ?? 'accept')
+                    ->hidden(!auth()->user()->hasRole('teknisi') ),
+                // Forms\Components\Select::make('status')
+                //     ->options([
+                //         'finish' => 'finish',
+                //         're-schedule' => 're-schedule',
+                //     ])
+                //     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
+                //     ->hidden(!auth()->user()->hasRole('tenknisi')),
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
                     ->minDate(now())
@@ -89,13 +99,13 @@ class ComplaintResource extends Resource
                 Forms\Components\Textarea::make('complaint')
                     ->required()
                     ->columnSpanFull()
-                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('pj')),
+                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('koordinator')),
                     Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
@@ -105,13 +115,14 @@ class ComplaintResource extends Resource
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('pj'))
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
                     ->columnSpanFull(),
 
                 Forms\Components\FileUpload::make('photo3')
+                    ->label('Bukti Selesai')
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
@@ -119,6 +130,7 @@ class ComplaintResource extends Resource
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
+                    ->required(auth()->user()->hasRole('teknisi'))
                     ->hidden(auth()->user()->hasRole('user'))
                     ->columnSpanFull(),
 
@@ -159,8 +171,10 @@ class ComplaintResource extends Resource
                 Tables\Columns\TextColumn::make('user_verified')
                     ->label('Verified by')
                     ->formatStateUsing(function ($state, $record) {
-                        return $record->user_verified ? $record->user_verified : 'Not Verified';
+                        return $record->user_verified ? $record->user_verified : '';
                     })
+                    ->default('-')
+                    ->color('black')
                     ->searchable(isIndividual:true) // mencari data
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
@@ -191,6 +205,8 @@ class ComplaintResource extends Resource
                             return 'Finished';
                         } elseif ($record?->status === 'accept') {
                             return 'Finish';
+                        } elseif ($record?->status === 'completed') {
+                            return 'Completed';
                         }
                         return 'Not Finish';
                     })
@@ -201,13 +217,16 @@ class ComplaintResource extends Resource
                         }
                         return 'danger';
                     })
+                    ->hidden(function(?Complaint $record){
+                        return !auth()->user()->hasRole('user') || $record->status == 'completed';
+                    } )
                     ->disabled(function(?Complaint $record) {
-                        if (in_array($record?->status, ['accept', 'finish'])) {
+                        if (in_array($record?->status, ['accept', 'completed'])) {
                             return true;
                         }
-                        if (auth()->user()->hasRole('tenknisi')) {
-                            return true;
-                        }
+                        // if (auth()->user()->hasRole('tenknisi')) {
+                        //     return true;
+                        // }
                         return false;
 
                     })
@@ -249,31 +268,40 @@ class ComplaintResource extends Resource
                     ])
                     ->action(function (array $data, ?Complaint $record) {
                         $record->update([
-                            'status' => 'finish',
+                            'status' => 'completed',
                         ]);
 
                         Penilaian::create([
                             'complaint_id' => $record->id,
                             'user_id' => $record->user_id,
+                            'user_verified' => $record->user_verified,
                             'rating_layanan' => $data['rating_layanan'],
                             'rating_kualitas' => $data['rating_kualitas'],
                             'rating_kecepatan' => $data['rating_kecepatan'],
                             'komentar' => $data['komentar'],
                         ]);
                     }),
-                ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
-                    ,
+
                     Tables\Actions\EditAction::make()
+                    ->label('Update')
+                    ->button()
                     // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
                     ->hidden(function (?Complaint $record) {
+                        // if (auth()->user()->hasRole('teknisi') && $record?->status === 'accept') {
+                        //     return true;
+                        // }
+                        // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
+                        //     return true;
+                        // }
                         if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
                             return true;
                         }
                         return false;
                     }),
+                    Tables\Actions\ViewAction::make()
+                    ,
 
-                ]),
+
 
             ])
             ->bulkActions([
@@ -317,12 +345,16 @@ class ComplaintResource extends Resource
     if (auth()->user()->hasRole('user')) {
         $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
     }
-    if (auth()->user()->hasRole('tenknisi')) {
-        $query->where('verify_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
+    if (auth()->user()->hasRole('teknisi')) {
+        $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
     }
-    if (auth()->user()->hasRole('pj')) {
-        $query->leftJoin('');
-        $query->where('verify_id', auth()->id())->orWhere('status','request'); // Hanya data yang dimiliki user yang login
+    if (auth()->user()->hasRole('koordinator')) {
+            // $query->leftJoin('','');
+        $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')
+            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
+            ->where('towers.id', auth()->user()->tower_id)
+            ->select('complaints.*', 'users.name as user_name', 'towers.id as tower_id');
+
     }
 
 
