@@ -97,7 +97,7 @@ class User extends Authenticatable
     }
     public function penilaian()
     {
-        return $this->hasMany(Penilaian::class,'user_verified');
+        return $this->hasMany(Penilaian::class);
     }
 
     // {
