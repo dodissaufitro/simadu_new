@@ -98,8 +98,7 @@ class UserResource extends Resource
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->label('Unit')
-                            ->required(),
+                            ->label('Unit'),
                     ]),
                 // Forms\Components\TextInput::make('rusun_id')
                 //     ->relationship('rusun', 'name')

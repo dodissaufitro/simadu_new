@@ -35,7 +35,10 @@ class Profile extends Page
                 Section::make('Profile Detail')->schema([
                     ImageEntry::make('image')
                         ->label('Foto Profil')
-                        ->hiddenLabel(),
+                        ->hiddenLabel()
+                        ->height(100)
+                        ->width(100)
+                        ->cirle(),
                     TextEntry::make('name')->label('Nama')->default($this->record->name??'-'),
                     TextEntry::make('email')->label('Email'),
                     TextEntry::make('phone')->label('No. Telepon')->default($this->record->phone??'-'),

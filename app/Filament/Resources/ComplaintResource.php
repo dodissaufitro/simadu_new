@@ -158,6 +158,10 @@ class ComplaintResource extends Resource
                     ->sortable()
                     ->limit(50)
                     ->wrap(),
+                Tables\Columns\ImageColumn::make('photo1')
+                    ->disk('public')
+                    ->directory('complaints')
+                    ->cirle(),
                 // Tables\Columns\TextColumn::make('unit.name')
                 //     ->label('Rusun')
                 //     ->formatStateUsing(function ($state, $record) {
