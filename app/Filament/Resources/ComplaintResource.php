@@ -271,7 +271,7 @@ class ComplaintResource extends Resource
                     ])
                     ->action(function (array $data, ?Complaint $record) {
                         $record->update([
-                            'status' => 'done',
+                            'status' => 'completed'
                         ]);
 
                         Penilaian::create([
@@ -282,6 +282,7 @@ class ComplaintResource extends Resource
                             'rating_kualitas' => $data['rating_kualitas'],
                             'rating_kecepatan' => $data['rating_kecepatan'],
                             'komentar' => $data['komentar'],
+                            'status' =>'done'
                         ]);
                     }),
 
