@@ -25,6 +25,27 @@ class ComplaintResource extends Resource
     protected static ?string $navigationLabel = 'Complaint';
     protected static ?string $title = 'Complaint';
 
+     public static function getNavigationBadge(): ?string
+    {
+        if(Auth::user()->hasRole('teknisi'))
+        {
+            return (string) Complaint::where('status', 'finished')->where('user_id',auth()->user()->id)->count();
+        }
+        if(Auth::user()->hasRole('user'))
+        {
+            return (string) Complaint::where('status', 'request')->count();
+        }
+        if(Auth::user()->hasRole('koordinator'))
+        {
+            return (string) Complaint::where('status', 'request')->count();
+        }
+
+        return (string) Complaint::where('status', 'request')->count();
+    }
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
 
 
     public static function form(Form $form): Form
@@ -283,6 +304,7 @@ class ComplaintResource extends Resource
                             'rating_kecepatan' => $data['rating_kecepatan'],
                             'komentar' => $data['komentar'],
                             'status' =>'done'
+
                         ]);
                     }),
 
