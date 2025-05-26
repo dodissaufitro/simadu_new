@@ -17,25 +17,25 @@ class CountComplaintReport extends BaseWidget
 
         if(Auth::user()->hasRole('teknisi')){
             return [
-            Stat::make('Complaint Report', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
-            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)->count())
+            Stat::make('Complaint Report', Complaint::leftJoin('teknisi_on_complaints', 'complaints.id', '=', 'teknisi_on_complaints.complaint_id')
+            ->where('teknisi_on_complaints.teknisi_id', auth()->user()->tower_id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Accepted', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
-            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            Stat::make('Complaint Accepted', Complaint::leftJoin('teknisi_on_complaints', 'complaints.id', '=', 'teknisi_on_complaints.complaint_id')
+            ->where('teknisi_on_complaints.teknisi_id', auth()->user()->tower_id)
             ->where('complaints.status','accept')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
-            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            Stat::make('Complaint Finish', Complaint::leftJoin('teknisi_on_complaints', 'complaints.id', '=', 'teknisi_on_complaints.complaint_id')
+            ->where('teknisi_on_complaints.teknisi_id', auth()->user()->tower_id)
             ->where('complaints.status','completed')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Pending', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
-            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            Stat::make('Pending', Complaint::leftJoin('teknisi_on_complaints', 'complaints.id', '=', 'teknisi_on_complaints.complaint_id')
+            ->where('teknisi_on_complaints.teknisi_id', auth()->user()->tower_id)
             ->where('complaints.status','pending')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')

@@ -36,7 +36,7 @@ class ComplaintResource extends Resource
     {
         if(Auth::user()->hasRole('teknisi'))
         {
-            return (string) Complaint::leftJoin('teknisioncomplaints','complaints.id','=','teknisioncomplaint.complaint_id')->where('status', 'pending')->where('teknisi_id',auth()->user()->id)->count();
+            return (string) Complaint::leftJoin('teknisi_on_complaints','complaints.id','=','teknisi_on_complaints.complaint_id')->where('complaints.status', 'pending')->where('teknisi_id','=',auth()->user()->id)->count();
         }
         if(Auth::user()->hasRole('user'))
         {
@@ -497,7 +497,7 @@ class ComplaintResource extends Resource
     // }
 
     if(auth()->user()->hasRole('teknsi')){
-        $query->leftJoin('teknisiOnCompalints','complaints.id','=','teknisiOnCompalints.complaint_id')->where('teknisiOnCompalints.teknisi_id','=',auth()->user()->id)
+        $query->leftJoin('teknisi_on_compalints','complaints.id','=','teknisi_on_compalints.complaint_id')->where('teknisi_on_compalints.teknisi_id','=',auth()->user()->id)
         ->select('complaints.*');
 
     }
