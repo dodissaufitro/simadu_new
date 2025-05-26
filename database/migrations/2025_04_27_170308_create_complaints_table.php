@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('photo1');
             $table->text('photo2')->nullable();
             $table->text('photo3')->nullable();
-            $table->enum('status',['accept','finish','request','deny','pending','completed'])->default('request');
+            $table->enum('status',['accept','finish','proses','request','deny','pending','completed'])->default('request');
             $table->date('tanggal_eksekusi')->nullable();
             $table->text('keterangan')->nullable();
             $table->softDeletes();

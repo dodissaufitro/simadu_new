@@ -119,7 +119,6 @@ class ComplaintResource extends Resource
                 //     ->hidden(!auth()->user()->hasRole('tenknisi')),
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
-                    ->minDate(now())
                     ->hidden(auth()->user()->hasRole('user'))
                     ->placeholder('Tanggal Eksekusi'),
                 Forms\Components\Textarea::make('complaint')
@@ -257,6 +256,7 @@ class ComplaintResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                 ->hidden(!auth()->user()->hasRole('super_admin')),
+
             ])
             ->actions([
                 Tables\Actions\Action::make('Update Teknisi')
@@ -269,7 +269,7 @@ class ComplaintResource extends Resource
                     //     return 'danger';
                     // })
                     ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" ;
+                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" || $record->status=="completed" ;
                     } )
                     ->modalHeading('Confirmasi Teknisi')
                     ->modalSubheading('Update informasi kamu.')
@@ -369,7 +369,7 @@ class ComplaintResource extends Resource
                         return 'danger';
                     })
                     ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('user') || $record->status=="completed";
+                        return !auth()->user()->hasRole('user') || $record->status=="completed" ||  $record->status=="request" ||  $record->status=="pending";
                     } )
                     ->modalHeading('Confirmasi Complaint')
                     ->modalSubheading('Update informasi kamu.')
@@ -438,10 +438,10 @@ class ComplaintResource extends Resource
                         // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
                         //     return true;
                         // }
-                        if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
+                        if (!auth()->user()->hasRole('super_admin')) {
                             return true;
                         }
-                        elseif ( $record?->status === 'completed') {
+                        elseif ($record?->status == 'completed') {
                             return true;
                         }
                         return false;
