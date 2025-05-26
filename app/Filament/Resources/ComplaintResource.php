@@ -44,7 +44,7 @@ class ComplaintResource extends Resource
         }
         if(Auth::user()->hasRole('koordinator'))
         {
-            return (string) Complaint::where('status', 'request')->where('tower_id','=',auth()->user()->tower()->id)->count();
+            return (string) Complaint::where('status', 'request')->where('tower_id','=',auth()->user()->tower->id)->count();
         }
 
         return (string) Complaint::where('status', 'request')->count();
