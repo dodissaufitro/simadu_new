@@ -271,7 +271,7 @@ class ComplaintResource extends Resource
                     //     return 'danger';
                     // })
                     ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" || $record->status=="completed" ;
+                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" || $record->status=="completed" || $record->status=="request" ||  $record->status=="denied" ;
                     } )
                     ->modalHeading('Confirmasi Teknisi')
                     ->modalSubheading('Update informasi kamu.')
@@ -498,7 +498,7 @@ class ComplaintResource extends Resource
     //     $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
     // }
 
-    if(auth()->user()->hasRole('teknsi')){
+    if(auth()->user()->hasRole('teknisi')){
         $query->leftJoin('teknisi_on_compalints','complaints.id','=','teknisi_on_compalints.complaint_id')->where('teknisi_on_compalints.teknisi_id','=',auth()->user()->id)
         ->select('complaints.*');
 
