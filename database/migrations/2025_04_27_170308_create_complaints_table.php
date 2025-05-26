@@ -14,14 +14,15 @@ return new class extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tower_id')->constrained('towers')->onDelete('cascade');
             $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('user_verified')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('koor_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->text('complaint');
             $table->text('photo1');
             $table->text('photo2')->nullable();
             $table->text('photo3')->nullable();
-            $table->enum('status',['accept','finish','request','deny','re-schedule','completed'])->default('request');
+            $table->enum('status',['accept','finish','request','deny','pending','completed'])->default('request');
             $table->date('tanggal_eksekusi')->nullable();
             $table->text('keterangan')->nullable();
             $table->softDeletes();

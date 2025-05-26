@@ -51,7 +51,6 @@ class UserResource extends Resource
                             ->searchable()
                             ->preload()
                             ->live()
-
                             ->afterStateUpdated(function(Set $set){
                                 $set('tower_id',null);
                                 $set('lantai_id',null);
@@ -70,6 +69,7 @@ class UserResource extends Resource
                             ->searchable()
                             ->preload()
                             ->live()
+                            ->required()
                             ->afterStateUpdated(function(Set $set){
                                 $set('lantai_id',null);
                                 $set('unit_id',null);
@@ -137,7 +137,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('No')
                     ->label('No')
                     ->rowIndex(),
-                Tables\Columns\TextColumn::make('unit.lantai.tower.rusun.name')
+                Tables\Columns\TextColumn::make('rusun.name')
                     ->label('Rusun')
                     ->numeric()
                     ->sortable(),
@@ -147,7 +147,10 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Role')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

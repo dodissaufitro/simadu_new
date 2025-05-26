@@ -16,7 +16,8 @@ return new class extends Migration
             $table->id()->primary();
             $table->foreignId('complaint_id')->constrained('complaints')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('user_verified')->constrained('users')->onDelete('cascade');
+            $table->foreignId('tower_id')->constrained('towers')->onDelete('cascade');
+            $table->foreignId('koor_id')->constrained('users')->onDelete('cascade');
             $table->integer('rating_layanan');
             $table->integer('rating_kualitas');
             $table->integer('rating_kecepatan');

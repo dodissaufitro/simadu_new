@@ -5,7 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ComplaintResource\Pages;
 use App\Models\Complaint;
 use App\Models\Penilaian;
+use App\Models\TeknisiOnComplaint;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\ImageEntry;
@@ -72,14 +79,14 @@ class ComplaintResource extends Resource
                 //     })
                 //     ->columnSpanFull(),
 
-                    Forms\Components\Select::make('user_verified')
+                    Forms\Components\Select::make('koor_id')
                     ->label('Verified by')
                     ->options(\App\Models\User::whereHas('roles', function ($query) {
-                        $query->where('name', 'teknisi');
+                        $query->where('name', 'koordinator');
                     })->pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::id())
                     ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
-                    ->hidden(auth()->user()->hasRole('teknisi') ),
+                    ->hidden(!auth()->user()->hasRole('super_admin') ),
 
                     Forms\Components\Select::make('user_id')
                     ->label('Penghuni')
@@ -89,9 +96,7 @@ class ComplaintResource extends Resource
                 Forms\Components\Select::make('status')
                     ->options([
                         // KOOR
-                        'accept' => 'accept',
-                        // 'finish' => 'finish',
-                        // 're-schedule' => 're-schedule',
+                        'pending' => 'pending',
                         'deny' => 'deny',
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
@@ -104,7 +109,7 @@ class ComplaintResource extends Resource
                         're-schedule' => 're-schedule'
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'accept')
-                    ->hidden(!auth()->user()->hasRole('teknisi') ),
+                    ->hidden(!auth()->user()->hasRole('super_admin') ),
                 // Forms\Components\Select::make('status')
                 //     ->options([
                 //         'finish' => 'finish',
@@ -134,6 +139,7 @@ class ComplaintResource extends Resource
 
                 Forms\Components\FileUpload::make('photo2')
                     ->image()
+                    ->downloadable()
                     ->disk('public')
                     ->directory('complaints')
                     ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
@@ -158,6 +164,37 @@ class ComplaintResource extends Resource
                 Forms\Components\Textarea::make('keterangan')
                     ->hidden(auth()->user()->hasRole('user'))
                     ->columnSpanFull(),
+
+
+                Repeater::make('TeknisiOnComplaint')
+                    ->label('Teknisi Yang Ditugaskan')
+                    ->relationship()
+                    ->schema([
+                        Select::make('teknisi_id')
+                            ->label('Nama Teknisi')
+                            ->required()
+                            ->options(User::role('teknisi')->pluck('name', 'id')->toArray()),
+                        Select::make('status')
+                            ->label('Status')
+                            ->disabled(auth()->user()->hasRole('koordinator'))
+                            ->options([
+                                'accept'=>'Accept',
+                                'denied'=>'Denied',
+                            ]),
+                        FileUpload::make('image')
+                            ->image()
+                            ->label('Bukti Selesai')
+                            ->downloadable()
+                            ->disabled(auth()->user()->hasRole('koordinator'))
+
+                    ])
+                    ->defaultItems(1)
+                    ->minItems(1)
+                    ->reorderable(true)
+                    ->addActionLabel('Tambah Teknisi')
+                    ->columnSpanFull()
+                    ->hidden(auth()->user()->hasRole('user'))
+                    ->required(),
             ]);
     }
 
@@ -193,11 +230,8 @@ class ComplaintResource extends Resource
                     ->label('User Complaint')
                     ->searchable(isIndividual:true) // mencari data
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user_verified')
-                    ->label('Verified by')
-                    ->formatStateUsing(function ($state, $record) {
-                        return $record->user_verified ? $record->user_verified : '';
-                    })
+                Tables\Columns\TextColumn::make('koor.name')
+                    ->label('Koordinator')
                     ->default('-')
                     ->color('black')
                     ->searchable(isIndividual:true) // mencari data
@@ -212,7 +246,7 @@ class ComplaintResource extends Resource
                     'finish' => 'success',
                     'completed' => 'success',
                     'request' => 'gray',
-                    're-schedule' => 'warning',
+                    'pending' => 'warning',
                     'deny' => 'danger',
                 }),
                 Tables\Columns\TextColumn::make('tanggal_eksekusi')
@@ -333,6 +367,126 @@ class ComplaintResource extends Resource
 
 
             ])
+            ->actions([
+                Tables\Actions\Action::make('Update Teknisi')
+                    ->label('Update')
+                    ->button()
+                    // ->color(function (?Complaint $record) {
+                    //     if (in_array($record?->status, ['accept', 'finish'])) {
+                    //         return 'success';
+                    //     }
+                    //     return 'danger';
+                    // })
+                    ->hidden(function(?Complaint $record){
+                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" ;
+                    } )
+                    ->modalHeading('Confirmasi Teknisi')
+                    ->modalSubheading('Update informasi kamu.')
+                    ->modalButton('Finish')
+                    ->form([
+
+                        Forms\Components\TextInput::make('Unit')
+                        ->disabled()
+                        ->default(fn (?Complaint $record) =>  $record?->user->lantai->name.', Unit '. $record?->user->unit->name)
+                        ,
+                        Forms\Components\DatePicker::make('tanggal_eksekusi')
+                        ->disabled()
+                        ->default(fn (?Complaint $record) => $record?->tanggal_eksekusi)
+                        ,
+                        Forms\Components\Textarea::make('complaint')
+                        ->disabled()
+                        ->default(fn (?Complaint $record) => $record?->complaint)
+                        ,
+                        Forms\Components\FileUpload::make('photo1')
+                        ->image()
+                        ->label('Bukti Complaint')
+                        ->disabled()
+                        ->default(fn (?Complaint $record) => $record?->photo1)
+                        ->disk('public')
+                        ->directory('complaint'),
+                        Forms\Components\Select::make('status')
+                            ->required()
+                            ->disabled(fn (?Complaint $record)=>$record->status == 'accept')
+                            ->options([
+                               'accept'=>'Accept',
+                               'denied'=>'Denied'
+                            ])
+                            ->default(function (?Complaint $record) {
+                            return $record?->TeknisiOnComplaint
+                                ->where('teknisi_id', auth()->user()->id)
+                                ->first()
+                                ?->status;
+                            }),
+                        Forms\Components\FileUpload::make('image')
+                        ->required()
+                        ->label('Bukti Selesai')
+                        ->hidden(fn (?Complaint $record)=>$record->status == 'pending')
+                        ->image()
+                        ->default(function (?Complaint $record) {
+                            return $record?->TeknisiOnComplaint
+                                ->where('teknisi_id', auth()->user()->id)
+                                ->first()
+                                ?->image;
+                            })
+                        ->disk('public')
+                        ->directory('bukti_selesai'),
+                    ])
+                    ->action(function (array $data, ?Complaint $record) {
+
+                        if($record->status=='pending')
+                        {
+                            TeknisiOnComplaint::where('complaint_id',$record->id)->where('teknisi_id',auth()->user()->id)
+                                ->update([
+                                'status'=>$data['status']
+                                ]);
+                        }
+                        if($record->status=='accept')
+                        {
+                            TeknisiOnComplaint::where('complaint_id',$record->id)->where('teknisi_id',auth()->user()->id)
+                                ->update([
+                                'image'=>$data['image']
+                                ]);
+                        }
+
+
+                        $totalTeknisi = TeknisiOnComplaint::where('complaint_id','=',$record->id)->count();
+                        $totalTeknisiAccept = TeknisiOnComplaint::where('complaint_id','=',$record->id)->where('status','=','accept')->count();
+                        $totalImageUpload = TeknisiOnComplaint::where('complaint_id','=',$record->id)->where('image','!=','')->count();
+
+
+                        if($record->status=='pending' && $totalTeknisi == $totalTeknisiAccept  )
+                        {
+                            $record->update([
+                                'status'=>'accept'
+                            ]);
+                        }
+                        if($record->status=='accept' && $totalTeknisi == $totalImageUpload  )
+                        {
+                            $record->update([
+                                'status'=>'finish',
+                                'photo3'=>$data['image']
+                            ]);
+                        }
+
+                    }),
+
+                    Tables\Actions\EditAction::make()
+                    ->label('Update')
+                    ->button()
+                    // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
+                    ->hidden(function (?Complaint $record) {
+                        if (!auth()->user()->hasRole('super_admin') ) {
+                            return true;
+                        }
+                        // elseif ( $record?->status === 'completed') {
+                        //     return true;
+                        // }
+                        return false;
+                    }),
+                    Tables\Actions\ViewAction::make()
+                    ,
+
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
@@ -374,9 +528,15 @@ class ComplaintResource extends Resource
     if (auth()->user()->hasRole('user')) {
         $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
     }
-    if (auth()->user()->hasRole('teknisi')) {
-        $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
+    // if (auth()->user()->hasRole('teknisi')) {
+    //     $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
+    // }
+
+    if(auth()->user()->hasRole('teknsi')){
+        $query->leftJoin('teknisiOnCompalints','complaints.user_id','=','teknisiOnCompalints.user_id');
+
     }
+
     if (auth()->user()->hasRole('koordinator')) {
             // $query->leftJoin('','');
         $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')

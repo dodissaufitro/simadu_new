@@ -22,8 +22,10 @@ class Complaint extends Model
         static::creating(function ($complaint) {
             if (auth()->check() && auth()->user()->hasRole('user')) {
                 $complaint->unit_id = auth()->user()->unit->id;
+                $complaint->tower_id = auth()->user()->tower->id;
                 $complaint->user_id = auth()->user()->id;
             }
+
             if (auth()->check() && auth()->user()->hasRole('super_admin')) {
                 // $complaint->user_id = auth()->user()->id;
                 $user = User::find($complaint->user_id);
@@ -32,21 +34,33 @@ class Complaint extends Model
             }
         });
 
-        // static::updating(function ($complaint) {
+        static::updating(function($complaint){
+            if (auth()->check() && auth()->user()->hasRole('koordinator')) {
+                // $complaint->unit_id = auth()->user()->unit->id;
+                $complaint->koor_id = auth()->user()->id;
+            }
+        });
 
-        //     // if (auth()->check() && auth()->user()->hasRole('petugas')) {
-        //     //     $complaint->user_verified = auth()->user()->id;
-        //     // }
+        // static::updated(function($complaint){
+        //     if (auth()->check() && auth()->user()->hasRole('teknisi')) {
+        //         $totalTeknisi = TeknisiOnComplaint::where('complaint_id','=',$complaint->id)->count();
+        //         $totalTeknisiAccept = TeknisiOnComplaint::where('complaint_id','=',$complaint->id)->where('status','=','accept')->count();
+        //         $totalImageUpload = TeknisiOnComplaint::where('complaint_id','=',$complaint->id)->where('image','!=','')->count();
 
-        //     // if($complaint->status == 'finished') {
-        //     //     Penilaian::create([
-        //     //         'complaint_id' => $complaint->id,
-        //     //         'user_id' => $complaint->user_id,
-        //     //         'rating_pelayanan' => $complaint->rating_pelayanan,
-        //     //         'rating_kualitas' => $complaint->rating_kualitas,
-        //     //         'rating_kecepatan' => $complaint->rating_kecepatan,
-        //     //     ]);
-        //     // }
+        //         if($complaint->status=='pending' && $totalTeknisi == $totalTeknisiAccept  )
+        //         {
+        //             Complaint::updated([
+        //                 'status'=>'accept'
+        //             ]);
+        //         }
+        //         if($complaint->status=='accept' && $totalTeknisi == $totalImageUpload  )
+        //         {
+        //             Complaint::updated([
+        //                 'status'=>'finish'
+        //             ]);
+        //         }
+
+        //     }
         // });
     }
 
@@ -62,9 +76,13 @@ class Complaint extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function Verified()
+    public function koor()
     {
         return $this->belongsTo(User::class);
+    }
+    public function TeknisiOnComplaint()
+    {
+        return $this->hasMany(TeknisiOnComplaint::class,'complaint_id');
     }
 
 }

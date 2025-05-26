@@ -75,6 +75,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function unit()    {
         return $this->belongsTo(Unit::class);
     }
@@ -93,11 +94,16 @@ class User extends Authenticatable
     }
     public function complaints2()
     {
-        return $this->hasMany(Complaint::class,'user_verified');
+        return $this->hasMany(Complaint::class,'koor_id');
     }
     public function penilaian()
     {
         return $this->hasMany(Penilaian::class);
+    }
+
+    public function teknisi()
+    {
+        return $this->hasMany(TeknisiOnComplaint::class,'teknisi_id');
     }
 
     // {
