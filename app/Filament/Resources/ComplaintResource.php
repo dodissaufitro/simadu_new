@@ -440,7 +440,7 @@ class ComplaintResource extends Resource
                         // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
                         //     return true;
                         // }
-                        if (!auth()->user()->hasRole('super_admin') || !auth()->user()->hasRole('koordinator')  ) {
+                        if (!auth()->user()->hasRole('koordinator') ) {
                             return true;
                         }
                         elseif ($record?->status == 'completed') {
