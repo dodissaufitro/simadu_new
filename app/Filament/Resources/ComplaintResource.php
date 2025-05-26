@@ -497,7 +497,8 @@ class ComplaintResource extends Resource
     // }
 
     if(auth()->user()->hasRole('teknsi')){
-        $query->leftJoin('teknisiOnCompalints','complaints.user_id','=','teknisiOnCompalints.user_id');
+        $query->leftJoin('teknisiOnCompalints','complaints.id','=','teknisiOnCompalints.complaint_id')->where('teknisiOnCompalints.teknisi_id','=',auth()->user()->id)
+        ->select('complaints.*');
 
     }
 
