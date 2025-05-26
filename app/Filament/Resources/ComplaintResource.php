@@ -36,7 +36,7 @@ class ComplaintResource extends Resource
     {
         if(Auth::user()->hasRole('teknisi'))
         {
-            return (string) Complaint::leftJoin('teknisi_on_complaints','complaints.id','=','teknisi_on_complaints.complaint_id')->where('complaints.status', 'pending')->where('teknisi_id','=',auth()->user()->id)->count();
+            return (string) Complaint::leftJoin('teknisi_on_complaints','complaints.id','=','teknisi_on_complaints.complaint_id')->where('complaints.status', 'proses')->where('teknisi_id','=',auth()->user()->id)->count();
         }
         if(Auth::user()->hasRole('user'))
         {
@@ -96,6 +96,7 @@ class ComplaintResource extends Resource
                 Forms\Components\Select::make('status')
                     ->options([
                         // KOOR
+                        'proses' => 'proses',
                         'pending' => 'pending',
                         'deny' => 'deny',
                     ])
@@ -246,6 +247,7 @@ class ComplaintResource extends Resource
                     'completed' => 'success',
                     'request' => 'gray',
                     'pending' => 'warning',
+                    'proses' => 'info',
                     'deny' => 'danger',
                 }),
                 Tables\Columns\TextColumn::make('tanggal_eksekusi')
@@ -311,7 +313,7 @@ class ComplaintResource extends Resource
                         Forms\Components\FileUpload::make('image')
                         ->required()
                         ->label('Bukti Selesai')
-                        ->hidden(fn (?Complaint $record)=>$record->status == 'pending')
+                        ->hidden(fn (?Complaint $record)=>$record->status == 'proses')
                         ->image()
                         ->default(function (?Complaint $record) {
                             return $record?->TeknisiOnComplaint
@@ -324,7 +326,7 @@ class ComplaintResource extends Resource
                     ])
                     ->action(function (array $data, ?Complaint $record) {
 
-                        if($record->status=='pending')
+                        if($record->status=='proses')
                         {
                             TeknisiOnComplaint::where('complaint_id',$record->id)->where('teknisi_id',auth()->user()->id)
                                 ->update([
@@ -345,7 +347,7 @@ class ComplaintResource extends Resource
                         $totalImageUpload = TeknisiOnComplaint::where('complaint_id','=',$record->id)->where('image','!=','')->count();
 
 
-                        if($record->status=='pending' && $totalTeknisi == $totalTeknisiAccept  )
+                        if($record->status=='proses' && $totalTeknisi == $totalTeknisiAccept  )
                         {
                             $record->update([
                                 'status'=>'accept'
@@ -369,7 +371,7 @@ class ComplaintResource extends Resource
                         return 'danger';
                     })
                     ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('user') || $record->status=="completed" ||  $record->status=="request" ||  $record->status=="pending";
+                        return !auth()->user()->hasRole('user') || $record->status=="completed" ||  $record->status=="request" ||  $record->status=="proses" || $record->status=="pending";
                     } )
                     ->modalHeading('Confirmasi Complaint')
                     ->modalSubheading('Update informasi kamu.')
