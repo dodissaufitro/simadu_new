@@ -17,33 +17,26 @@ class CountComplaintReport extends BaseWidget
 
         if(Auth::user()->hasRole('teknisi')){
             return [
-            Stat::make('Complaint Report', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->count())
+            Stat::make('Complaint Report', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
+            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Accepted', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','accept')->count())
+            Stat::make('Complaint Accepted', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
+            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            ->where('complaints.status','accept')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','completed')->count())
+            Stat::make('Complaint Finish', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
+            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            ->where('complaints.status','completed')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Reschedule ME', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','re-schedule')->count())
-                ->extraAttributes(['class' => 'text-center '])
-                ->icon('heroicon-o-user')
-                ->color('red'),
-            Stat::make('Reschedule User', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','reschedule')->count())
+            Stat::make('Pending', Complaint::leftJoin('teknisioncomplaints', 'complaints.id', '=', 'teknisioncomplaints.complaint_id')
+            ->where('teknisioncomplaints.user_id', auth()->user()->tower_id)
+            ->where('complaints.status','pending')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
@@ -51,7 +44,7 @@ class CountComplaintReport extends BaseWidget
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Feedback', Penilaian::where('user_verified',auth()->user()->id)->count())
+            Stat::make('Feedback', Penilaian::where('koor_id',auth()->user()->id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
@@ -67,7 +60,15 @@ class CountComplaintReport extends BaseWidget
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::where('status','completed')->where('user_id',auth()->user()->id)->count())
+            Stat::make('Complaint Completed', Complaint::where('status','pending')->where('user_id',auth()->user()->id)->count())
+                ->extraAttributes(['class' => 'text-center '])
+                ->icon('heroicon-o-user')
+                ->color('red'),
+            Stat::make('Complaint Completed', Complaint::where('status','accept')->where('user_id',auth()->user()->id)->count())
+                ->extraAttributes(['class' => 'text-center '])
+                ->icon('heroicon-o-user')
+                ->color('red'),
+            Stat::make('Complaint Completed', Complaint::where('status','completed')->where('user_id',auth()->user()->id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
@@ -79,33 +80,23 @@ class CountComplaintReport extends BaseWidget
         }
         if(Auth::user()->hasRole('koordinator')){
             return [
-            Stat::make('Complaint Report', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->count())
+            Stat::make('Complaint Report', Complaint::where('tower_id', auth()->user()->tower_id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Accepted', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','accept')->count())
+            Stat::make('Complaint Accepted', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','accept')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','completed')->count())
+            Stat::make('Complaint Finish', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','completed')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Reschedule ME', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','re-schedule')->count())
+            Stat::make('Pending', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','pending')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Reschedule User', Complaint::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->where('status','reschedule')->count())
+            Stat::make('Denied', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','denied')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
@@ -113,9 +104,7 @@ class CountComplaintReport extends BaseWidget
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Feedback', Penilaian::leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)->count())
+            Stat::make('Feedback', Penilaian::where('tower_id', auth()->user()->tower_id)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),

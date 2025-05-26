@@ -36,15 +36,15 @@ class ComplaintResource extends Resource
     {
         if(Auth::user()->hasRole('teknisi'))
         {
-            return (string) Complaint::where('status', 'finished')->where('user_id',auth()->user()->id)->count();
+            return (string) Complaint::where('status', 'pending')->where('user_id',auth()->user()->id)->count();
         }
         if(Auth::user()->hasRole('user'))
         {
-            return (string) Complaint::where('status', 'request')->count();
+            return (string) Complaint::where('status', 'finish')->where('user_id',auth()->user()->id)->count();
         }
         if(Auth::user()->hasRole('koordinator'))
         {
-            return (string) Complaint::where('status', 'request')->count();
+            return (string) Complaint::where('status', 'request')->where('tower_id','=',auth()->user()->tower()->id)->count();
         }
 
         return (string) Complaint::where('status', 'request')->count();
@@ -259,115 +259,6 @@ class ComplaintResource extends Resource
                 ->hidden(!auth()->user()->hasRole('super_admin')),
             ])
             ->actions([
-                Tables\Actions\Action::make('customModal')
-                    ->label(function (?Complaint $record) {
-                        if ($record?->status === 'finish') {
-                            return 'Finished';
-                        } elseif ($record?->status === 'accept') {
-                            return 'Finish';
-                        }
-                        return 'Not Finish';
-                    })
-                    ->button()
-                    ->color(function (?Complaint $record) {
-                        if (in_array($record?->status, ['accept', 'finish'])) {
-                            return 'success';
-                        }
-                        return 'danger';
-                    })
-                    ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('user') || $record->status == 'completed';
-                    } )
-                    ->disabled(function(?Complaint $record) {
-                        if (in_array($record?->status, ['accept', 'completed'])) {
-                            return true;
-                        }
-                        // if (auth()->user()->hasRole('tenknisi')) {
-                        //     return true;
-                        // }
-                        return false;
-
-                    })
-                    ->modalHeading('Confirmasi Complaint')
-                    ->modalSubheading('Update informasi kamu.')
-                    ->modalButton('Finish')
-
-                    ->form([
-                        Forms\Components\Select::make('rating_layanan')
-                            ->required()
-                            ->options([
-                                1 => '⭐',
-                                2 => '⭐⭐',
-                                3 => '⭐⭐⭐',
-                                4 => '⭐⭐⭐⭐',
-                                5 => '⭐⭐⭐⭐⭐',
-                            ]),
-                        Forms\Components\Select::make('rating_kualitas')
-                        ->required()
-                        ->options([
-                            1 => '⭐',
-                            2 => '⭐⭐',
-                            3 => '⭐⭐⭐',
-                            4 => '⭐⭐⭐⭐',
-                            5 => '⭐⭐⭐⭐⭐',
-                        ]),
-                        Forms\Components\Select::make('rating_kecepatan')
-                        ->required()
-                        ->options([
-                            1 => '⭐',
-                            2 => '⭐⭐',
-                            3 => '⭐⭐⭐',
-                            4 => '⭐⭐⭐⭐',
-                            5 => '⭐⭐⭐⭐⭐',
-                        ]),
-                        Forms\Components\Textarea::make('komentar')
-                            ->columnSpanFull(),
-
-                    ])
-                    ->action(function (array $data, ?Complaint $record) {
-                        $record->update([
-                            'status' => 'completed'
-                        ]);
-
-                        Penilaian::create([
-                            'complaint_id' => $record->id,
-                            'user_id' => $record->user_id,
-                            'user_verified' => $record->user_verified,
-                            'rating_layanan' => $data['rating_layanan'],
-                            'rating_kualitas' => $data['rating_kualitas'],
-                            'rating_kecepatan' => $data['rating_kecepatan'],
-                            'komentar' => $data['komentar'],
-                            'status' =>'done'
-
-                        ]);
-                    }),
-
-                    Tables\Actions\EditAction::make()
-                    ->label('Update')
-                    ->button()
-                    // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
-                    ->hidden(function (?Complaint $record) {
-                        // if (auth()->user()->hasRole('teknisi') && $record?->status === 'accept') {
-                        //     return true;
-                        // }
-                        // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
-                        //     return true;
-                        // }
-                        if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
-                            return true;
-                        }
-                        elseif ( $record?->status === 'completed') {
-                            return true;
-                        }
-                        return false;
-                    }),
-                    Tables\Actions\ViewAction::make()
-                    ,
-
-
-
-            ])
-            ->actions([
                 Tables\Actions\Action::make('Update Teknisi')
                     ->label('Update')
                     ->button()
@@ -469,24 +360,97 @@ class ComplaintResource extends Resource
                         }
 
                     }),
+                Tables\Actions\Action::make('Rating Modal')
+                    ->button()
+                    ->color(function (?Complaint $record) {
+                        if (in_array($record?->status, ['accept', 'finish'])) {
+                            return 'success';
+                        }
+                        return 'danger';
+                    })
+                    ->hidden(function(?Complaint $record){
+                        return !auth()->user()->hasRole('user') || $record->status=="completed";
+                    } )
+                    ->modalHeading('Confirmasi Complaint')
+                    ->modalSubheading('Update informasi kamu.')
+                    ->modalButton('Finish')
+
+                    ->form([
+                        Forms\Components\Select::make('rating_layanan')
+                            ->required()
+                            ->options([
+                                1 => '⭐',
+                                2 => '⭐⭐',
+                                3 => '⭐⭐⭐',
+                                4 => '⭐⭐⭐⭐',
+                                5 => '⭐⭐⭐⭐⭐',
+                            ]),
+                        Forms\Components\Select::make('rating_kualitas')
+                        ->required()
+                        ->options([
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                        ]),
+                        Forms\Components\Select::make('rating_kecepatan')
+                        ->required()
+                        ->options([
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                        ]),
+                        Forms\Components\Textarea::make('komentar')
+                            ->columnSpanFull(),
+
+                    ])
+                    ->action(function (array $data, ?Complaint $record) {
+                        $record->update([
+                            'status' => 'completed'
+                        ]);
+
+                        Penilaian::create([
+                            'complaint_id' => $record->id,
+                            'user_id' => $record->user_id,
+                            'tower_id' => $record->tower_id,
+                            'koor_id' => $record->koor_id,
+                            'user_verified' => $record->user_verified,
+                            'rating_layanan' => $data['rating_layanan'],
+                            'rating_kualitas' => $data['rating_kualitas'],
+                            'rating_kecepatan' => $data['rating_kecepatan'],
+                            'komentar' => $data['komentar'],
+                            'status' =>'done'
+
+                        ]);
+                    }),
 
                     Tables\Actions\EditAction::make()
                     ->label('Update')
                     ->button()
                     // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
                     ->hidden(function (?Complaint $record) {
-                        if (!auth()->user()->hasRole('super_admin') ) {
-                            return true;
-                        }
-                        // elseif ( $record?->status === 'completed') {
+                        // if (auth()->user()->hasRole('teknisi') && $record?->status === 'accept') {
                         //     return true;
                         // }
+                        // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
+                        //     return true;
+                        // }
+                        if (!auth()->user()->hasRole('super_admin') && $record?->status === 'finish') {
+                            return true;
+                        }
+                        elseif ( $record?->status === 'completed') {
+                            return true;
+                        }
                         return false;
                     }),
-                    Tables\Actions\ViewAction::make()
-                    ,
+                    Tables\Actions\ViewAction::make(),
+
 
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
