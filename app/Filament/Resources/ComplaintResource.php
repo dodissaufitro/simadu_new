@@ -36,7 +36,7 @@ class ComplaintResource extends Resource
     {
         if(Auth::user()->hasRole('teknisi'))
         {
-            return (string) Complaint::where('status', 'pending')->where('user_id',auth()->user()->id)->count();
+            return (string) Complaint::leftJoin('teknisioncomplaints','complaints.id','=','teknisioncomplaint.complaint_id')->where('status', 'pending')->where('teknisi_id',auth()->user()->id)->count();
         }
         if(Auth::user()->hasRole('user'))
         {
