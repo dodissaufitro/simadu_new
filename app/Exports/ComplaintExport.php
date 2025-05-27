@@ -34,10 +34,10 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             'kr.rusun_id as rusun',
             'kr.tower_id as tower',
         ])
-            ->leftJoin('towers as tw', 'tw.id', '=', 'complaints.tower_id')
-            ->leftJoin('units as un', 'un.id', '=', 'complaints.unit_id')
-            ->leftJoin('users as us', 'us.id', '=', 'complaints.user_id')
-            ->leftJoin('users as kr', 'kr.id', '=', 'complaints.koor_id')
+            ->leftJoin('towers as tw', 'complaints.tower_id','=','tw.id')
+            ->leftJoin('units as un', 'complaints.unit_id','=','un.id')
+            ->leftJoin('users as us', 'complaints.user_id','=','us.id')
+            ->leftJoin('users as kr','complaints.koor_id','=', 'kr.id')
             ;
 
         if ($this->tglTempoFrom) {
@@ -52,11 +52,11 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
         }
 
         if ($this->rusun) {
-            $query->whereDate('kr.rusun_id', '=', $this->rusun);
+            $query->where('kr.rusun_id', '=', $this->rusun);
         }
 
         if ($this->tower) {
-            $query->whereDate('kr.tower_id', '=', $this->rusun);
+            $query->where('kr.tower_id', '=', $this->tower);
         }
 
 
