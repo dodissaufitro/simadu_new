@@ -4,43 +4,30 @@ namespace App\Exports;
 
 use App\Models\Penilaian;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class PenilaianExport implements FromCollection
+class PenilaianExport implements FromCollection, WithHeadings, WithMapping
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
 
     protected $tglTempoFrom;
     protected $tglTempoUntil;
     protected $rusun;
     protected $tower;
 
-    public function __construct($tglTempoFrom = null, $tglTempoUntil = null,$rusun=null,$tower=null)
+    public function __construct($tglTempoFrom = null, $tglTempoUntil = null, $rusun = null, $tower = null)
     {
         $this->tglTempoFrom = $tglTempoFrom;
         $this->tglTempoUntil = $tglTempoUntil;
-        $this->rusun= $rusun;
-        $this->tower= $tower;
+        $this->rusun = $rusun;
+        $this->tower = $tower;
     }
 
     public function collection()
     {
-
-        // $query = Complaint::select([
-        //     'complaints.*',
-        //     'us.name as user_name',
-        //     'un.name as unit_name',
-        //     'tw.name as tower_name',
-        //     'kr.name as koor_name',
-        //     'kr.rusun_id as rusun',
-        //     'kr.tower_id as tower',
-        // ])
-        //     ->leftJoin('towers as tw', 'tw.id', '=', 'complaints.tower_id')
-        //     ->leftJoin('units as un', 'un.id', '=', 'complaints.unit_id')
-        //     ->leftJoin('users as us', 'us.id', '=', 'complaints.user_id')
-        //     ->leftJoin('users as kr', 'kr.id', '=', 'complaints.koor_id')
-        //     ;
 
         $query = Penilaian::select([
             'penilaians.*',
@@ -48,18 +35,17 @@ class PenilaianExport implements FromCollection
             'rs.name as rusun_name',
             'tw.name as tower_name'
         ])
-        ->leftJoin('towers as tw', 'penilaians.tower_id','=', 'tw.id')
-        ->leftJoin('users as us', 'penilaians.user_id','=', 'us.id')
-        ->leftJoin('users as kr', 'penilaians.koor_id','=', 'kr.id' )
-        ->leftJoin('rusuns as rs', 'kr.rusun_id', '=', 'rs.id')
-        ;
+            ->leftJoin('towers as tw', 'penilaians.tower_id', '=', 'tw.id')
+            ->leftJoin('users as us', 'penilaians.user_id', '=', 'us.id')
+            ->leftJoin('users as kr', 'penilaians.koor_id', '=', 'kr.id')
+            ->leftJoin('rusuns as rs', 'kr.rusun_id', '=', 'rs.id');
 
         if ($this->tglTempoFrom) {
-            $query->whereDate('create_at', '>=', $this->tglTempoFrom);
+            $query->whereDate('penilaians.create_at', '>=', $this->tglTempoFrom);
         }
 
         if ($this->tglTempoUntil) {
-            $query->whereDate('create_at', '<=', $this->tglTempoUntil);
+            $query->whereDate('penilaians.create_at', '<=', $this->tglTempoUntil);
         }
 
         if ($this->rusun) {
@@ -70,10 +56,10 @@ class PenilaianExport implements FromCollection
             $query->where('kr.tower_id', '=', $this->tower);
         }
 
-        return $query;
+        return $query->get();
     }
 
-       public function headings(): array
+    public function headings(): array
     {
         return [
             'Name',
@@ -88,7 +74,7 @@ class PenilaianExport implements FromCollection
     {
         return [
             $row->user_name,
-            $row->user->rusun_name.'-'.$row->user->tower_name,
+            $row->user->rusun_name . '-' . $row->user->tower_name,
             $row->rating_layanan,
             $row->rating_kecepatan,
             $row->rating_kualitas

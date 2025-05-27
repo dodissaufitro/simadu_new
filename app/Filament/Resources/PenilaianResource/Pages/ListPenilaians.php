@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PenilaianResource\Pages;
 
+use App\Exports\PenilaianExport;
 use App\Filament\Resources\PenilaianResource;
 use App\Models\Penilaian;
 use App\Models\Rusun;
@@ -21,7 +22,7 @@ class ListPenilaians extends ListRecords
     {
         return [
             Actions\CreateAction::make()->label('Tambah')
-            ->icon('heroicon-o-plus-circle'),
+                ->icon('heroicon-o-plus-circle'),
 
             Action::make('Excel')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -43,14 +44,14 @@ class ListPenilaians extends ListRecords
                 ])
                 ->action(function (array $data) {
                     return Excel::download(
-                        new Penilaian(
+                        new PenilaianExport(
                             $data['tgl_tempo_from'] ?? null,
                             $data['tgl_tempo_until'] ?? null,
                             $data['rusun'] ?? null,
                             $data['tower'] ?? null,
 
                         ),
-                        'Rating_'. $data['rusun'].'-'.$data['tower']. date('Y-m-d') . '.xlsx'
+                        'Rating_' . $data['rusun'] . '-' . $data['tower'] . date('Y-m-d') . '.xlsx'
                     );
                 })
                 ->color('info'),
