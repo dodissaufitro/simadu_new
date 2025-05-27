@@ -4,12 +4,15 @@ namespace App\Filament\Resources\ComplaintResource\Pages;
 
 use App\Exports\ComplaintExport;
 use App\Filament\Resources\ComplaintResource;
+use App\Models\Rusun;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Filters\SelectFilter;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListComplaints extends ListRecords
 {
@@ -25,6 +28,10 @@ class ListComplaints extends ListRecords
             Action::make('Laporan')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->form([
+                    SelectFilter::make('rusun')
+                    ->label('Rusun')
+                    ->options(Rusun::pluck('name','id'))
+                    ,
                     DatePicker::make('tgl_tempo_from')
                         ->label('Dari Tanggal'),
                     DatePicker::make('tgl_tempo_until')
@@ -48,9 +55,10 @@ class ListComplaints extends ListRecords
                         new ComplaintExport(
                             $data['tgl_tempo_from'] ?? null,
                             $data['tgl_tempo_until'] ?? null,
-                            $data['status'] ?? null
+                            $data['status'] ?? null,
+                            $data['rusun'] ?? null
                         ),
-                        'complaints_export_' . date('Y-m-d') . '.xlsx'
+                        'complaints_export_'.$data['rusun'].'_' . date('Y-m-d') . '.xlsx'
                     );
                 })
                 ->color('info'),

@@ -12,12 +12,14 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
     protected $tglTempoFrom;
     protected $tglTempoUntil;
     protected $status;
+    protected $rusun;
 
-    public function __construct($tglTempoFrom = null, $tglTempoUntil = null, $status = null)
+    public function __construct($tglTempoFrom = null, $tglTempoUntil = null, $status = null,$rusun)
     {
         $this->tglTempoFrom = $tglTempoFrom;
         $this->tglTempoUntil = $tglTempoUntil;
         $this->status = $status;
+        $this->rusun = $rusun;
     }
 
     public function collection()
@@ -32,7 +34,9 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             ->leftJoin('towers as tw', 'tw.id', '=', 'complaints.tower_id')
             ->leftJoin('units as un', 'un.id', '=', 'complaints.unit_id')
             ->leftJoin('users as us', 'us.id', '=', 'complaints.user_id')
-            ->leftJoin('users as kr', 'kr.id', '=', 'complaints.koor_id');
+            ->leftJoin('users as kr', 'kr.id', '=', 'complaints.koor_id')
+            ->where('rusun.id','=',$this->rusun)
+            ;
 
         if ($this->tglTempoFrom) {
             $query->whereDate('complaints.created_at', '>=', $this->tglTempoFrom);
