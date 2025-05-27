@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ComplaintResource\Pages;
 use App\Exports\ComplaintExport;
 use App\Filament\Resources\ComplaintResource;
 use App\Models\Rusun;
+use App\Models\Tower;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -28,10 +29,6 @@ class ListComplaints extends ListRecords
             Action::make('Laporan')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->form([
-                    SelectFilter::make('rusun')
-                    ->label('Rusun')
-                    ->options(Rusun::pluck('name','id'))
-                    ,
                     DatePicker::make('tgl_tempo_from')
                         ->label('Dari Tanggal'),
                     DatePicker::make('tgl_tempo_until')
@@ -49,6 +46,19 @@ class ListComplaints extends ListRecords
                         ])
                         ->placeholder('Semua Status')
                         ->nullable(),
+                    Select::make('rusun')
+                        ->label('Rusun')
+                        ->options(fn() => Rusun::pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder('Semua Unit')
+                        ->nullable(),
+                    Select::make('tower')
+                        ->label('Tower')
+                        ->options(fn() => Tower::pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder('Semua Tower')
+                        ->nullable(),
+
                 ])
                 ->action(function (array $data) {
                     return Excel::download(
@@ -56,9 +66,10 @@ class ListComplaints extends ListRecords
                             $data['tgl_tempo_from'] ?? null,
                             $data['tgl_tempo_until'] ?? null,
                             $data['status'] ?? null,
-                            $data['rusun'] ?? null
+                            $data['rusun'] ?? null,
+                            $data['tower'] ?? null,
                         ),
-                        'complaints_export_'.$data['rusun'].'_' . date('Y-m-d') . '.xlsx'
+                        'complaints_export_'.$data['rusun'].'_'. $data['tower']. date('Y-m-d') . '.xlsx'
                     );
                 })
                 ->color('info'),

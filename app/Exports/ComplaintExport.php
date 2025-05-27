@@ -13,8 +13,9 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
     protected $tglTempoUntil;
     protected $status;
     protected $rusun;
+    protected $tower;
 
-    public function __construct($tglTempoFrom = null, $tglTempoUntil = null, $status = null,$rusun)
+    public function __construct($tglTempoFrom = null, $tglTempoUntil = null, $status = null,$rusun=null,$tower=null)
     {
         $this->tglTempoFrom = $tglTempoFrom;
         $this->tglTempoUntil = $tglTempoUntil;
@@ -29,13 +30,14 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             'us.name as user_name',
             'un.name as unit_name',
             'tw.name as tower_name',
-            'kr.name as koor_name'
+            'kr.name as koor_name',
+            'kr.rusun_id as rusun',
+            'kr.tower_id as tower',
         ])
             ->leftJoin('towers as tw', 'tw.id', '=', 'complaints.tower_id')
             ->leftJoin('units as un', 'un.id', '=', 'complaints.unit_id')
             ->leftJoin('users as us', 'us.id', '=', 'complaints.user_id')
             ->leftJoin('users as kr', 'kr.id', '=', 'complaints.koor_id')
-            ->where('rusun.id','=',$this->rusun)
             ;
 
         if ($this->tglTempoFrom) {
@@ -47,6 +49,14 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
         }
         if ($this->status) {
             $query->whereDate('complaints.status', '<=', $this->status);
+        }
+
+        if ($this->rusun) {
+            $query->whereDate('rusun', '=', $this->rusun);
+        }
+
+        if ($this->tower) {
+            $query->whereDate('tower', '=', $this->rusun);
         }
 
 
