@@ -29,10 +29,15 @@ class LantaiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('tower_id')
+                    ->label('Tower - Rusun')
                     ->relationship('tower', 'name')
-                    ->searchable() // mencari data
-                    ->preload() // mengambil data 5-10 data
+                    ->getOptionLabelFromRecordUsing(function ($record) {
+                        return ($record->rusun->name ?? '') . ' - Tower ' . $record->name;
+                    })
+                    ->searchable()
+                    ->preload()
                     ->required(),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),

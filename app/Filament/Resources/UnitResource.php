@@ -29,10 +29,17 @@ class UnitResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('lantai_id')
-                    ->relationship('lantai','name')
-                    ->searchable() // mencari data
-                    ->preload() // mengambil data 5-10 data
+                    ->label('Unit - Lantai')
+                    ->relationship('lantai', 'name')
+                    ->getOptionLabelFromRecordUsing(function ($record) {
+                        return ($record->tower->rusun->name ?? '-') . ' - Tower ' .
+                            ($record->tower->name ?? '-') . ' - Lantai ' .
+                            ($record->name ?? '-');
+                    })
+                    ->searchable()
+                    ->preload()
                     ->required(),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -48,7 +55,7 @@ class UnitResource extends Resource
                     ->rowIndex(),
                 // Tables\Columns\TextColumn::make('lantai.name')
                 //     ->sortable(),
-                    TextColumn::make('lantai_id')
+                TextColumn::make('lantai_id')
                     ->sortable()
                     ->label('Lokasi')
                     ->formatStateUsing(function ($state, $record) {
@@ -56,7 +63,7 @@ class UnitResource extends Resource
                         $rusunName = $record->lantai->tower->rusun->name ?? '-';
                         $lantaiName = $record->lantai->name ?? '-';
 
-                        return "{$towerName} - {$rusunName} - Lantai {$lantaiName}";
+                        return "{$rusunName} - Tower {$towerName} - Lantai {$lantaiName}";
                     }),
 
                 Tables\Columns\TextColumn::make('name')

@@ -32,19 +32,16 @@ class ComplaintResource extends Resource
     protected static ?string $navigationLabel = 'Complaint';
     protected static ?string $title = 'Complaint';
 
-     public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
-        if(Auth::user()->hasRole('teknisi'))
-        {
-            return (string) Complaint::leftJoin('teknisi_on_complaints','complaints.id','=','teknisi_on_complaints.complaint_id')->where('complaints.status', 'proses')->where('teknisi_id','=',auth()->user()->id)->count();
+        if (Auth::user()->hasRole('teknisi')) {
+            return (string) Complaint::leftJoin('teknisi_on_complaints', 'complaints.id', '=', 'teknisi_on_complaints.complaint_id')->where('complaints.status', 'proses')->where('teknisi_id', '=', auth()->user()->id)->count();
         }
-        if(Auth::user()->hasRole('user'))
-        {
-            return (string) Complaint::where('status', 'finish')->where('user_id',auth()->user()->id)->count();
+        if (Auth::user()->hasRole('user')) {
+            return (string) Complaint::where('status', 'finish')->where('user_id', auth()->user()->id)->count();
         }
-        if(Auth::user()->hasRole('koordinator'))
-        {
-            return (string) Complaint::where('status', 'request')->where('tower_id','=',auth()->user()->tower->id)->count();
+        if (Auth::user()->hasRole('koordinator')) {
+            return (string) Complaint::where('status', 'request')->where('tower_id', '=', auth()->user()->tower->id)->count();
         }
 
         return (string) Complaint::where('status', 'request')->count();
@@ -79,16 +76,16 @@ class ComplaintResource extends Resource
                 //     })
                 //     ->columnSpanFull(),
 
-                    Forms\Components\Select::make('koor_id')
+                Forms\Components\Select::make('koor_id')
                     ->label('Verified by')
                     ->options(\App\Models\User::whereHas('roles', function ($query) {
                         $query->where('name', 'koordinator');
                     })->pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::id())
                     ->disabled(auth()->user()->hasRole('user')) // jika user biasa, tidak bisa diubah
-                    ->hidden(!auth()->user()->hasRole('super_admin') ),
+                    ->hidden(!auth()->user()->hasRole('super_admin')),
 
-                    Forms\Components\Select::make('user_id')
+                Forms\Components\Select::make('user_id')
                     ->label('Penghuni')
                     ->options(\App\Models\User::pluck('name', 'id')) // tampilkan nama, tapi value tetap ID
                     ->default(Auth::user()->hasRole('tenknisi') ? Auth::user()->id : null) // jika user biasa, ambil ID user yang login
@@ -101,7 +98,7 @@ class ComplaintResource extends Resource
                         'deny' => 'deny',
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'request')
-                    ->hidden(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('user') ),
+                    ->hidden(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('user')),
                 Forms\Components\Select::make('status')
                     ->options([
                         // 'request' => 'request',
@@ -110,7 +107,7 @@ class ComplaintResource extends Resource
                         're-schedule' => 're-schedule'
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'accept')
-                    ->hidden(!auth()->user()->hasRole('super_admin') ),
+                    ->hidden(!auth()->user()->hasRole('super_admin')),
                 // Forms\Components\Select::make('status')
                 //     ->options([
                 //         'finish' => 'finish',
@@ -126,7 +123,7 @@ class ComplaintResource extends Resource
                     ->required()
                     ->columnSpanFull()
                     ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('koordinator')),
-                    Forms\Components\FileUpload::make('photo1')
+                Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
@@ -178,8 +175,8 @@ class ComplaintResource extends Resource
                             ->label('Status')
                             ->disabled(auth()->user()->hasRole('koordinator'))
                             ->options([
-                                'accept'=>'Accept',
-                                'denied'=>'Denied',
+                                'accept' => 'Accept',
+                                'denied' => 'Denied',
                             ]),
                         FileUpload::make('image')
                             ->image()
@@ -212,14 +209,13 @@ class ComplaintResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('complaint')
                     ->label('Complaint')
-                    ->searchable(isIndividual:true) // mencari data
+                    ->searchable(isIndividual: true) // mencari data
                     ->sortable()
                     ->limit(50)
                     ->wrap(),
                 Tables\Columns\ImageColumn::make('photo1')
-                ->label('Photo')
-                ->circular()
-                 ,
+                    ->label('Photo')
+                    ->circular(),
                 // Tables\Columns\TextColumn::make('unit.name')
                 //     ->label('Rusun')
                 //     ->formatStateUsing(function ($state, $record) {
@@ -228,36 +224,36 @@ class ComplaintResource extends Resource
                 //     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('User Complaint')
-                    ->searchable(isIndividual:true) // mencari data
+                    ->searchable(isIndividual: true) // mencari data
                     ->sortable(),
                 Tables\Columns\TextColumn::make('koor.name')
                     ->label('Koordinator')
                     ->default('-')
                     ->color('black')
-                    ->searchable(isIndividual:true) // mencari data
+                    ->searchable(isIndividual: true) // mencari data
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                ->label('Status')
-                ->sortable()
-                ->searchable(isIndividual:true) // mencari data
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'accept' => 'primary',
-                    'finish' => 'success',
-                    'completed' => 'success',
-                    'request' => 'gray',
-                    'pending' => 'warning',
-                    'proses' => 'info',
-                    'deny' => 'danger',
-                }),
+                    ->label('Status')
+                    ->sortable()
+                    ->searchable(isIndividual: true) // mencari data
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'accept' => 'primary',
+                        'finish' => 'success',
+                        'completed' => 'success',
+                        'request' => 'gray',
+                        'pending' => 'warning',
+                        'proses' => 'info',
+                        'deny' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('tanggal_eksekusi')
                     ->date()
                     ->sortable()
-                    ->searchable(isIndividual:true),
+                    ->searchable(isIndividual: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
-                ->hidden(!auth()->user()->hasRole('super_admin')),
+                    ->hidden(!auth()->user()->hasRole('super_admin')),
 
             ])
             ->actions([
@@ -270,97 +266,89 @@ class ComplaintResource extends Resource
                     //     }
                     //     return 'danger';
                     // })
-                    ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('teknisi') || $record->status=="finish" || $record->status=="completed" || $record->status=="request" ||  $record->status=="denied" ;
-                    } )
+                    ->hidden(function (?Complaint $record) {
+                        return !auth()->user()->hasRole('teknisi') || $record->status == "finish" || $record->status == "completed" || $record->status == "request" ||  $record->status == "denied";
+                    })
                     ->modalHeading('Confirmasi Teknisi')
                     ->modalSubheading('Update informasi kamu.')
                     ->modalButton('Finish')
                     ->form([
 
                         Forms\Components\TextInput::make('Unit')
-                        ->disabled()
-                        ->default(fn (?Complaint $record) =>  $record?->user->lantai->name.', Unit '. $record?->user->unit->name)
-                        ,
+                            ->disabled()
+                            ->default(fn(?Complaint $record) =>  $record?->user->lantai->name . ', Unit ' . $record?->user->unit->name),
                         Forms\Components\DatePicker::make('tanggal_eksekusi')
-                        ->disabled()
-                        ->default(fn (?Complaint $record) => $record?->tanggal_eksekusi)
-                        ,
+                            ->disabled()
+                            ->default(fn(?Complaint $record) => $record?->tanggal_eksekusi),
                         Forms\Components\Textarea::make('complaint')
-                        ->disabled()
-                        ->default(fn (?Complaint $record) => $record?->complaint)
-                        ,
+                            ->disabled()
+                            ->default(fn(?Complaint $record) => $record?->complaint),
                         Forms\Components\FileUpload::make('photo1')
-                        ->image()
-                        ->label('Bukti Complaint')
-                        ->disabled()
-                        ->default(fn (?Complaint $record) => $record?->photo1)
-                        ->disk('public')
-                        ->directory('complaint'),
+                            ->image()
+                            ->label('Bukti Complaint')
+                            ->disabled()
+                            ->default(fn(?Complaint $record) => $record?->photo1)
+                            ->disk('public')
+                            ->directory('complaint'),
                         Forms\Components\Select::make('status')
                             ->required()
-                            ->disabled(fn (?Complaint $record)=>$record->status == 'accept')
+                            ->disabled(fn(?Complaint $record) => $record->status == 'accept')
                             ->options([
-                               'accept'=>'Accept',
-                               'denied'=>'Denied'
+                                'accept' => 'Accept',
+                                'denied' => 'Denied'
                             ])
                             ->default(function (?Complaint $record) {
-                            return $record?->TeknisiOnComplaint
-                                ->where('teknisi_id', auth()->user()->id)
-                                ->first()
-                                ?->status;
+                                return $record?->TeknisiOnComplaint
+                                    ->where('teknisi_id', auth()->user()->id)
+                                    ->first()
+                                    ?->status;
                             }),
                         Forms\Components\FileUpload::make('image')
-                        ->required()
-                        ->label('Bukti Selesai')
-                        ->hidden(fn (?Complaint $record)=>$record->status == 'proses')
-                        ->image()
-                        ->default(function (?Complaint $record) {
-                            return $record?->TeknisiOnComplaint
-                                ->where('teknisi_id', auth()->user()->id)
-                                ->first()
-                                ?->image;
+                            ->required()
+                            ->label('Bukti Selesai')
+                            ->hidden(fn(?Complaint $record) => $record->status == 'proses')
+                            ->image()
+                            ->default(function (?Complaint $record) {
+                                return $record?->TeknisiOnComplaint
+                                    ->where('teknisi_id', auth()->user()->id)
+                                    ->first()
+                                    ?->image;
                             })
-                        ->disk('public')
-                        ->directory('bukti_selesai'),
+                            ->disk('public')
+                            ->directory('bukti_selesai'),
                     ])
                     ->action(function (array $data, ?Complaint $record) {
 
-                        if($record->status=='proses')
-                        {
-                            TeknisiOnComplaint::where('complaint_id',$record->id)->where('teknisi_id',auth()->user()->id)
+                        if ($record->status == 'proses') {
+                            TeknisiOnComplaint::where('complaint_id', $record->id)->where('teknisi_id', auth()->user()->id)
                                 ->update([
-                                'status'=>$data['status']
+                                    'status' => $data['status']
                                 ]);
                         }
-                        if($record->status=='accept')
-                        {
-                            TeknisiOnComplaint::where('complaint_id',$record->id)->where('teknisi_id',auth()->user()->id)
+                        if ($record->status == 'accept') {
+                            TeknisiOnComplaint::where('complaint_id', $record->id)->where('teknisi_id', auth()->user()->id)
                                 ->update([
-                                'image'=>$data['image']
+                                    'image' => $data['image']
                                 ]);
                         }
 
 
-                        $totalTeknisi = TeknisiOnComplaint::where('complaint_id','=',$record->id)->count();
-                        $totalTeknisiAccept = TeknisiOnComplaint::where('complaint_id','=',$record->id)->where('status','=','accept')->count();
-                        $totalImageUpload = TeknisiOnComplaint::where('complaint_id','=',$record->id)->where('image','!=','')->count();
+                        $totalTeknisi = TeknisiOnComplaint::where('complaint_id', '=', $record->id)->count();
+                        $totalTeknisiAccept = TeknisiOnComplaint::where('complaint_id', '=', $record->id)->where('status', '=', 'accept')->count();
+                        $totalImageUpload = TeknisiOnComplaint::where('complaint_id', '=', $record->id)->where('image', '!=', '')->count();
 
 
-                        if($record->status=='proses' && $totalTeknisi == $totalTeknisiAccept  )
-                        {
+                        if ($record->status == 'proses' && $totalTeknisi == $totalTeknisiAccept) {
                             $record->update([
-                                'status'=>'accept'
+                                'status' => 'accept'
                             ]);
                         }
-                        if($record->status=='accept' && $totalTeknisi == $totalImageUpload  )
-                        {
+                        if ($record->status == 'accept' && $totalTeknisi == $totalImageUpload) {
                             $record->update([
-                                'status'=>'finish',
-                                'photo3'=>$data['image']
+                                'status' => 'finish',
+                                'photo3' => $data['image']
                             ]);
                         }
-
                     }),
                 Tables\Actions\Action::make('Rating Modal')
                     ->button()
@@ -370,9 +358,9 @@ class ComplaintResource extends Resource
                         }
                         return 'danger';
                     })
-                    ->hidden(function(?Complaint $record){
-                        return !auth()->user()->hasRole('user') || $record->status=="completed" ||  $record->status=="request" ||  $record->status=="proses" || $record->status=="pending";
-                    } )
+                    ->hidden(function (?Complaint $record) {
+                        return !auth()->user()->hasRole('user') || $record->status == "completed" ||  $record->status == "request" ||  $record->status == "proses" || $record->status == "pending";
+                    })
                     ->modalHeading('Confirmasi Complaint')
                     ->modalSubheading('Update informasi kamu.')
                     ->modalButton('Finish')
@@ -388,23 +376,23 @@ class ComplaintResource extends Resource
                                 5 => '⭐⭐⭐⭐⭐',
                             ]),
                         Forms\Components\Select::make('rating_kualitas')
-                        ->required()
-                        ->options([
-                            1 => '⭐',
-                            2 => '⭐⭐',
-                            3 => '⭐⭐⭐',
-                            4 => '⭐⭐⭐⭐',
-                            5 => '⭐⭐⭐⭐⭐',
-                        ]),
+                            ->required()
+                            ->options([
+                                1 => '⭐',
+                                2 => '⭐⭐',
+                                3 => '⭐⭐⭐',
+                                4 => '⭐⭐⭐⭐',
+                                5 => '⭐⭐⭐⭐⭐',
+                            ]),
                         Forms\Components\Select::make('rating_kecepatan')
-                        ->required()
-                        ->options([
-                            1 => '⭐',
-                            2 => '⭐⭐',
-                            3 => '⭐⭐⭐',
-                            4 => '⭐⭐⭐⭐',
-                            5 => '⭐⭐⭐⭐⭐',
-                        ]),
+                            ->required()
+                            ->options([
+                                1 => '⭐',
+                                2 => '⭐⭐',
+                                3 => '⭐⭐⭐',
+                                4 => '⭐⭐⭐⭐',
+                                5 => '⭐⭐⭐⭐⭐',
+                            ]),
                         Forms\Components\Textarea::make('komentar')
                             ->columnSpanFull(),
 
@@ -424,12 +412,12 @@ class ComplaintResource extends Resource
                             'rating_kualitas' => $data['rating_kualitas'],
                             'rating_kecepatan' => $data['rating_kecepatan'],
                             'komentar' => $data['komentar'],
-                            'status' =>'done'
+                            'status' => 'done'
 
                         ]);
                     }),
 
-                    Tables\Actions\EditAction::make()
+                Tables\Actions\EditAction::make()
                     ->label('Update')
                     ->button()
                     // ->hidden(fn(?Complaint $record) => in_array($record?->status, ['accept', 'finish'])? true:false),
@@ -440,15 +428,14 @@ class ComplaintResource extends Resource
                         // if (!auth()->user()->hasRole('super_admin') && $record?->status == 'accept') {
                         //     return true;
                         // }
-                        if (!auth()->user()->hasRole('koordinator') ) {
+                        if (!auth()->user()->hasRole('koordinator')) {
                             return true;
-                        }
-                        elseif ($record?->status == 'completed') {
+                        } elseif ($record?->status == 'completed') {
                             return true;
                         }
                         return false;
                     }),
-                    Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make(),
 
 
             ])
@@ -456,11 +443,11 @@ class ComplaintResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                    ->hidden(!auth()->user()->hasRole('super_admin')),
+                        ->hidden(!auth()->user()->hasRole('super_admin')),
                     Tables\Actions\ForceDeleteBulkAction::make()
-                    ->hidden(!auth()->user()->hasRole('super_admin')),
+                        ->hidden(!auth()->user()->hasRole('super_admin')),
                     Tables\Actions\RestoreBulkAction::make()
-                    ->hidden(!auth()->user()->hasRole('super_admin')),
+                        ->hidden(!auth()->user()->hasRole('super_admin')),
                 ]),
             ]);
     }
@@ -483,38 +470,35 @@ class ComplaintResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-{
-    // Mulai dengan query eloquent dasar
-    $query = parent::getEloquentQuery();
+    {
+        // Mulai dengan query eloquent dasar
+        $query = parent::getEloquentQuery();
 
-    // Hilangkan global scope SoftDeletingScope
-    $query->withoutGlobalScopes([SoftDeletingScope::class]);
+        // Hilangkan global scope SoftDeletingScope
+        $query->withoutGlobalScopes([SoftDeletingScope::class]);
 
-    // Filter berdasarkan user_id, kecuali jika user adalah admin
-    if (auth()->user()->hasRole('user')) {
-        $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
-    }
-    // if (auth()->user()->hasRole('teknisi')) {
-    //     $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
-    // }
+        // Filter berdasarkan user_id, kecuali jika user adalah admin
+        if (auth()->user()->hasRole('user')) {
+            $query->where('user_id', auth()->id()); // Hanya data yang dimiliki user yang login
+        }
+        // if (auth()->user()->hasRole('teknisi')) {
+        //     $query->where('user_verified', auth()->id())->orWhere('status','=','accept'); // Hanya data yang dimiliki user yang login
+        // }
 
-    if(auth()->user()->hasRole('teknisi')){
-        $query->leftJoin('teknisi_on_compalints','complaints.id','=','teknisi_on_compalints.complaint_id')->where('teknisi_on_compalints.teknisi_id','=',auth()->user()->id)
-        ->select('complaints.*');
+        if (auth()->user()->hasRole('teknisi')) {
+            $query->leftJoin('teknisi_on_compalints', 'complaints.id', '=', 'teknisi_on_compalints.complaint_id')->where('teknisi_on_compalints.teknisi_id', '=', auth()->user()->id)
+                ->select('complaints.*');
+        }
 
-    }
-
-    if (auth()->user()->hasRole('koordinator')) {
+        if (auth()->user()->hasRole('koordinator')) {
             // $query->leftJoin('','');
-        $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')
-            ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-            ->where('towers.id', auth()->user()->tower_id)
-            ->select('complaints.*', 'users.name as user_name', 'towers.id as tower_id');
+            $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')
+                ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
+                ->where('towers.id', auth()->user()->tower_id)
+                ->select('complaints.*', 'users.name as user_name', 'towers.id as tower_id');
+        }
 
+
+        return $query->latest('created_at'); // Mengurutkan berdasarkan tanggal terbaru
     }
-
-
-    return $query->latest('created_at'); // Mengurutkan berdasarkan tanggal terbaru
-}
-
 }
