@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,7 +29,7 @@ class LantaiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('tower_id')
-                    ->relationship('tower','name')
+                    ->relationship('tower', 'name')
                     ->searchable() // mencari data
                     ->preload() // mengambil data 5-10 data
                     ->required(),
@@ -45,9 +46,15 @@ class LantaiResource extends Resource
                 Tables\Columns\TextColumn::make('No')
                     ->label('No')
                     ->rowIndex(),
-                Tables\Columns\TextColumn::make('tower.name')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('tower_id')
+                    ->sortable()
+                    ->label('Lokasi')
+                    ->formatStateUsing(function ($state, $record) {
+                        $towerName = $record->tower->name ?? '-';
+                        $rusunName = $record->tower->rusun->name ?? '-';
+
+                        return "{$rusunName} - Tower {$towerName}";
+                    }),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
