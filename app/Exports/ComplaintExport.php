@@ -72,7 +72,7 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             $complaint->created_at?->format('d/m/Y') ?? 'N/A',
             $complaint->complaint ?? '-',
             $complaint->status ?? 'N/A',
-            $complaint->tanggal_eksekusi?->format('d/m/Y') ?? 'Belum dieksekusi'
+            \Carbon\Carbon::parse($complaint->tanggal_eksekusi)?->format('d/m/Y') ?? 'Belum dieksekusi'
         ];
     }
 }
