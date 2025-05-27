@@ -52,11 +52,11 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
         }
 
         if ($this->rusun) {
-            $query->whereDate('rusun', '=', $this->rusun);
+            $query->whereDate('kr.rusun_id', '=', $this->rusun);
         }
 
         if ($this->tower) {
-            $query->whereDate('tower', '=', $this->rusun);
+            $query->whereDate('kr.tower_id', '=', $this->rusun);
         }
 
 
