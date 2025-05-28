@@ -19,6 +19,7 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -254,6 +255,20 @@ class ComplaintResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->hidden(!auth()->user()->hasRole('super_admin')),
+                SelectFilter::make('tower_id')
+                    ->label('Rusun - Tower')
+                    ->options(function () {
+                        return \App\Models\Tower::with('rusun')
+                            ->get()
+                            ->mapWithKeys(function ($tower) {
+                                $rusunName = $tower->rusun->name ?? 'Tanpa Rusun';
+                                $towerName = $tower->name;
+                                return [$tower->id => "{$rusunName} - {$towerName}"];
+                            })
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->preload(),
 
             ])
             ->actions([
