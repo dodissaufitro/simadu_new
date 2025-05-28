@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -55,23 +56,23 @@ class PenilaianResource extends Resource
                         5 => '⭐⭐⭐⭐⭐',
                     ]),
                 Forms\Components\Select::make('rating_kualitas')
-                ->required()
-                ->options([
-                    1 => '⭐',
-                    2 => '⭐⭐',
-                    3 => '⭐⭐⭐',
-                    4 => '⭐⭐⭐⭐',
-                    5 => '⭐⭐⭐⭐⭐',
-                ]),
+                    ->required()
+                    ->options([
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                    ]),
                 Forms\Components\Select::make('rating_kecepatan')
-                ->required()
-                ->options([
-                    1 => '⭐',
-                    2 => '⭐⭐',
-                    3 => '⭐⭐⭐',
-                    4 => '⭐⭐⭐⭐',
-                    5 => '⭐⭐⭐⭐⭐',
-                ]),
+                    ->required()
+                    ->options([
+                        1 => '⭐',
+                        2 => '⭐⭐',
+                        3 => '⭐⭐⭐',
+                        4 => '⭐⭐⭐⭐',
+                        5 => '⭐⭐⭐⭐⭐',
+                    ]),
                 Forms\Components\Textarea::make('komentar')
                     ->columnSpanFull(),
             ])
@@ -87,7 +88,7 @@ class PenilaianResource extends Resource
             //         ]);
             //     }
             // })
-            ;
+        ;
     }
 
     public static function table(Table $table): Table
@@ -99,51 +100,51 @@ class PenilaianResource extends Resource
                     ->rowIndex(),
                 Tables\Columns\TextColumn::make('complaint.complaint')
                     ->sortable()
-                    ->limit(50,'...')
-                    ->searchable(isIndividual:true),
+                    ->limit(50, '...')
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('user.name')
                     ->sortable()
-                    ->searchable(isIndividual:true),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('verified.name')
                     ->label('Teknisi')
                     ->hidden()
                     ->sortable()
-                    ->searchable(isIndividual:true),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('rating_layanan')
-                ->formatStateUsing(function ($state) {
-                    return match ($state) {
-                        1 => '⭐',
-                        2 => '⭐⭐',
-                        3 => '⭐⭐⭐⭐',
-                        4 => '⭐⭐⭐⭐⭐',
-                        5 => '⭐⭐⭐⭐⭐',
-                        default => ' ',
-                    };
-                }),
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                            default => ' ',
+                        };
+                    }),
 
                 Tables\Columns\TextColumn::make('rating_kualitas')
-                ->formatStateUsing(function ($state) {
-                    return match ($state) {
-                        1 => '⭐',
-                        2 => '⭐⭐',
-                        3 => '⭐⭐⭐⭐',
-                        4 => '⭐⭐⭐⭐⭐',
-                        5 => '⭐⭐⭐⭐⭐',
-                        default => ' ',
-                    };
-                }),
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                            default => ' ',
+                        };
+                    }),
 
                 Tables\Columns\TextColumn::make('rating_kecepatan')
-                ->formatStateUsing(function ($state) {
-                    return match ($state) {
-                        1 => '⭐',
-                        2 => '⭐⭐',
-                        3 => '⭐⭐⭐⭐',
-                        4 => '⭐⭐⭐⭐⭐',
-                        5 => '⭐⭐⭐⭐⭐',
-                        default => ' ',
-                    };
-                }),
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            1 => '⭐',
+                            2 => '⭐⭐',
+                            3 => '⭐⭐⭐⭐',
+                            4 => '⭐⭐⭐⭐⭐',
+                            5 => '⭐⭐⭐⭐⭐',
+                            default => ' ',
+                        };
+                    }),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
@@ -158,12 +159,26 @@ class PenilaianResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
+                Tables\Filters\TrashedFilter::make()->hidden(!auth()->user()->hasRole('super_admin')),
+                SelectFilter::make('tower_id')
+                    ->label('Rusun - Tower')
+                    ->options(function () {
+                        return \App\Models\Tower::with('rusun')
+                            ->get()
+                            ->mapWithKeys(function ($tower) {
+                                $rusunName = $tower->rusun->name ?? 'Tanpa Rusun';
+                                $towerName = $tower->name;
+                                return [$tower->id => "{$rusunName} - {$towerName}"];
+                            })
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->preload(), // jika bukan super admin
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make()->hidden(!auth()->user()->hasRole('super_admin')),// jika bukan super admin
+                    Tables\Actions\EditAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
                     Tables\Actions\DeleteAction::make()->hidden(!auth()->user()->hasRole('super_admin')), // jika bukan super admin
                 ]),
             ])
@@ -209,7 +224,7 @@ class PenilaianResource extends Resource
             $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
         if (auth()->user()->hasRole('koordinator')) {
-            $query->leftJoin('users','penilaian.user_id','=','id')->where('users.tower_id',auth()->user()->tower_id);
+            $query->leftJoin('users', 'penilaian.user_id', '=', 'id')->where('users.tower_id', auth()->user()->tower_id);
             // $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
 
