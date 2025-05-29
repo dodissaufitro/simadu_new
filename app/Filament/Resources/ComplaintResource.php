@@ -257,6 +257,7 @@ class ComplaintResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->hidden(!auth()->user()->hasRole('super_admin')),
                 SelectFilter::make('tower_id')
+                    ->hidden(!auth()->user()->hasRole('super_admin'))
                     ->label('Rusun - Tower')
                     ->options(function () {
                         return \App\Models\Tower::with('rusun')
@@ -438,11 +439,6 @@ class ComplaintResource extends Resource
                     ->button()
 
                     ->hidden(function (?Complaint $record) {
-
-
-
-
-
 
                         if (!auth()->user()->hasRole('koordinator')) {
                             return true;
