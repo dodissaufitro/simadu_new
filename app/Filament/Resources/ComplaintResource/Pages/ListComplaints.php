@@ -72,7 +72,7 @@ class ListComplaints extends ListRecords
                         'complaints_export_'.$data['rusun'].'_'. $data['tower']. date('Y-m-d') . '.xlsx'
                     );
                 })
-                ->hidden(!auth()->hasRole('koordinator'))
+                ->hidden(!auth()->user()->hasRole('koordinator'))
                 ->color('info'),
 
         ];
