@@ -54,6 +54,7 @@ class ListPenilaians extends ListRecords
                         'Rating_' . $data['rusun'] . '-' . $data['tower'] . date('Y-m-d') . '.xlsx'
                     );
                 })
+                ->hidden(!auth()->hasRole('koordinator'))
                 ->color('info'),
         ];
     }
