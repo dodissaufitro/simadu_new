@@ -224,8 +224,14 @@ class PenilaianResource extends Resource
             $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
         if (auth()->user()->hasRole('koordinator')) {
-            $query->leftJoin('users', 'penilaian.user_id', '=', 'id')->where('users.tower_id', auth()->user()->tower_id);
-            // $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
+            $query->where(function ($query) {
+                $query->where('user_id', auth()->user()->id)
+                    ->orWhereIn('user_id', function ($subquery) {
+                        $subquery->select('id')
+                            ->from('users')
+                            ->where('tower_id', auth()->user()->tower_id);
+                    });
+            });
         }
 
         return $query; // Mengurutkan berdasarkan tanggal terbaru

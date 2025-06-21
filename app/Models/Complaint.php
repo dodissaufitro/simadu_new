@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Complaint extends Model
 {
-    use SoftDeletes,HasFactory;
+    use SoftDeletes, HasFactory;
 
     protected $guarded = [
         'id',
@@ -32,9 +32,18 @@ class Complaint extends Model
                 // dd($user->unit_id);
                 $complaint->unit_id = $user->unit_id;
             }
+
+
+            if (auth()->check() && auth()->user()->hasRole('koordinator')) {
+                $user = auth()->user();
+
+                $complaint->unit_id  = $user->unit_id ?? 1;
+                $complaint->tower_id = $user->tower_id ?? 1;
+                $complaint->user_id  = $user->id;
+            }
         });
 
-        static::updating(function($complaint){
+        static::updating(function ($complaint) {
             if (auth()->check() && auth()->user()->hasRole('koordinator')) {
                 // $complaint->unit_id = auth()->user()->unit->id;
                 $complaint->koor_id = auth()->user()->id;
@@ -82,7 +91,6 @@ class Complaint extends Model
     }
     public function TeknisiOnComplaint()
     {
-        return $this->hasMany(TeknisiOnComplaint::class,'complaint_id');
+        return $this->hasMany(TeknisiOnComplaint::class, 'complaint_id');
     }
-
 }

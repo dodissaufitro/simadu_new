@@ -112,6 +112,10 @@ class ComplaintResource extends Resource
 
 
 
+
+
+
+
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
                     ->hidden(auth()->user()->hasRole('user'))
@@ -136,7 +140,7 @@ class ComplaintResource extends Resource
                     ->downloadable()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi'))
+                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
@@ -372,7 +376,12 @@ class ComplaintResource extends Resource
                         return 'danger';
                     })
                     ->hidden(function (?Complaint $record) {
-                        return !auth()->user()->hasRole('user') || $record->status == "completed" ||  $record->status == "request" ||  $record->status == "proses" || $record->status == "pending";
+                        if (!auth()->check()) return true;
+
+                        return (
+                            auth()->id() !== optional($record)->user_id ||
+                            in_array($record->status, ['completed', 'request', 'proses', 'pending'])
+                        );
                     })
                     ->modalHeading('Confirmasi Complaint')
                     ->modalSubheading('Update informasi kamu.')
