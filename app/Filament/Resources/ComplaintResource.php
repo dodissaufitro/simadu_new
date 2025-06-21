@@ -140,7 +140,7 @@ class ComplaintResource extends Resource
                     ->downloadable()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
+                    ->disabled(auth()->user()->hasRole('teknisi'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
