@@ -112,10 +112,6 @@ class ComplaintResource extends Resource
 
 
 
-
-
-
-
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
                     ->hidden(auth()->user()->hasRole('user'))
@@ -123,13 +119,13 @@ class ComplaintResource extends Resource
                 Forms\Components\Textarea::make('complaint')
                     ->required()
                     ->columnSpanFull()
-                    ->disabled(auth()->user()->hasRole('tenknisi') || auth()->user()->hasRole('koordinator')),
+                    ->disabled(auth()->user()->hasRole('tenknisi')),
                 Forms\Components\FileUpload::make('photo1')
                     ->required()
                     ->image()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
+                    ->disabled(auth()->user()->hasRole('teknisi'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })
@@ -140,7 +136,7 @@ class ComplaintResource extends Resource
                     ->downloadable()
                     ->disk('public')
                     ->directory('complaints')
-                    ->disabled(auth()->user()->hasRole('teknisi') || auth()->user()->hasRole('koordinator'))
+                    ->disabled(auth()->user()->hasRole('teknisi'))
                     ->getUploadedFileNameForStorageUsing(function ($file) {
                         return uniqid() . '-' . $file->getClientOriginalName();
                     })

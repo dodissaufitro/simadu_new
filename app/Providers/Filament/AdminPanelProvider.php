@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\ComplaintsChart;
 use App\Filament\Widgets\CountComplaintReport;
+use App\Filament\Widgets\FeedbacksChart;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -44,13 +46,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                ComplaintsChart::class,
                 CountComplaintReport::class,
             ])
             // ->homeUrl(fn () => $this->getHomeUrl())
             ->userMenuItems([
                 UserMenuItem::make()
                     ->label('Profil Saya')
-                    ->url(fn () => route('filament.admin.pages.profile'))
+                    ->url(fn() => route('filament.admin.pages.profile'))
                     ->icon('heroicon-o-user'),
             ])
             ->navigationGroups([
@@ -78,14 +81,14 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 
-//     public function getHomeUrl(): string
-// {
-//     $user = Auth::user();
+    //     public function getHomeUrl(): string
+    // {
+    //     $user = Auth::user();
 
-//     if ($user && !$user->hasRole('super_admin')) {
-//         return route('filament.admin.pages.profile'); // Ganti 'profile' dengan route yang sesuai halaman profile kamu
-//     }
+    //     if ($user && !$user->hasRole('super_admin')) {
+    //         return route('filament.admin.pages.profile'); // Ganti 'profile' dengan route yang sesuai halaman profile kamu
+    //     }
 
-//     return Filament::getUrl(); // Default ke dashboard
-// }
+    //     return Filament::getUrl(); // Default ke dashboard
+    // }
 }

@@ -69,10 +69,10 @@ class ListComplaints extends ListRecords
                             $data['rusun'] ?? null,
                             $data['tower'] ?? null,
                         ),
-                        'complaints_export_'.$data['rusun'].'_'. $data['tower']. date('Y-m-d') . '.xlsx'
+                        'complaints_export_' . $data['rusun'] . '_' . $data['tower'] . date('Y-m-d') . '.xlsx'
                     );
                 })
-                ->hidden(!auth()->user()->hasRole('koordinator'))
+                ->hidden(!auth()->user()->hasRole('koordinator') && !auth()->user()->hasRole('super_admin'))
                 ->color('info'),
 
         ];
