@@ -70,6 +70,9 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             'Tanggal Komplain',
             'Keluhan',
             'Status',
+            'Foto 1',
+            'Foto 2',
+            'Foto 3',
             'Tanggal Eksekusi'
         ];
     }
@@ -83,6 +86,15 @@ class ComplaintExport implements FromCollection, WithHeadings, WithMapping
             $complaint->created_at?->format('d/m/Y') ?? 'N/A',
             $complaint->complaint ?? '-',
             $complaint->status ?? 'N/A',
+            $complaint->photo1
+                ? 'https://simaduv.com/storage/' . ltrim($complaint->photo1, '/')
+                : 'N/A',
+            $complaint->photo2
+                ? 'https://simaduv.com/storage/' . ltrim($complaint->photo2, '/')
+                : 'N/A',
+            $complaint->photo3
+                ? 'https://simaduv.com/storage/' . ltrim($complaint->photo3, '/')
+                : 'N/A',
             \Carbon\Carbon::parse($complaint->tanggal_eksekusi)?->format('d/m/Y') ?? 'Belum dieksekusi'
         ];
     }
