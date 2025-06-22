@@ -26,7 +26,7 @@ class ListComplaints extends ListRecords
                 ->icon('heroicon-o-plus-circle'),
 
 
-            Action::make('Laporan')
+            Action::make('Download')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->form([
                     DatePicker::make('tgl_tempo_from')

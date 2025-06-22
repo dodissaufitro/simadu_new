@@ -19,6 +19,11 @@ class ComplaintsChart extends ChartWidget
         return '300px'; // tinggi chart
     }
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('user');
+    }
+
 
     protected function getData(): array
     {

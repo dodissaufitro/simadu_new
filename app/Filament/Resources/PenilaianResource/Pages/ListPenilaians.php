@@ -24,7 +24,7 @@ class ListPenilaians extends ListRecords
             Actions\CreateAction::make()->label('Tambah')
                 ->icon('heroicon-o-plus-circle'),
 
-            Action::make('Excel')
+            Action::make('Download')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->form([
                     DatePicker::make('tgl_tempo_from'),

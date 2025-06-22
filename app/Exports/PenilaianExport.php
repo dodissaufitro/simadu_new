@@ -41,11 +41,11 @@ class PenilaianExport implements FromCollection, WithHeadings, WithMapping
             ->leftJoin('rusuns as rs', 'kr.rusun_id', '=', 'rs.id');
 
         if ($this->tglTempoFrom) {
-            $query->whereDate('penilaians.create_at', '>=', $this->tglTempoFrom);
+            $query->whereDate('penilaians.created_at', '>=', $this->tglTempoFrom);
         }
 
         if ($this->tglTempoUntil) {
-            $query->whereDate('penilaians.create_at', '<=', $this->tglTempoUntil);
+            $query->whereDate('penilaians.created_at', '<=', $this->tglTempoUntil);
         }
 
         if ($this->rusun) {
