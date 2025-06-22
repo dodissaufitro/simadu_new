@@ -33,6 +33,8 @@ class ComplaintResource extends Resource
     protected static ?string $navigationLabel = 'Complaint';
     protected static ?string $title = 'Complaint';
 
+
+
     public static function getNavigationBadge(): ?string
     {
         if (Auth::user()->hasRole('teknisi')) {
@@ -58,25 +60,6 @@ class ComplaintResource extends Resource
 
         return $form
             ->schema([
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 Forms\Components\Select::make('koor_id')
                     ->label('Verified by')
                     ->options(\App\Models\User::whereHas('roles', function ($query) {
@@ -109,12 +92,6 @@ class ComplaintResource extends Resource
                     ])
                     ->default(fn(?Complaint $record) => $record?->status ?? 'accept')
                     ->hidden(!auth()->user()->hasRole('super_admin')),
-
-
-
-
-
-
 
                 Forms\Components\DatePicker::make('tanggal_eksekusi')
                     ->default(now())
@@ -219,11 +196,6 @@ class ComplaintResource extends Resource
                     ->label('Photo')
                     ->circular(),
 
-
-
-
-
-
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('User Complaint')
                     ->searchable(isIndividual: true)
@@ -277,11 +249,6 @@ class ComplaintResource extends Resource
                 Tables\Actions\Action::make('Update Teknisi')
                     ->label('Update')
                     ->button()
-
-
-
-
-
 
                     ->hidden(function (?Complaint $record) {
                         return !auth()->user()->hasRole('teknisi') || $record->status == "finish" || $record->status == "completed" || $record->status == "request" ||  $record->status == "denied";
@@ -496,8 +463,6 @@ class ComplaintResource extends Resource
         if (auth()->user()->hasRole('user')) {
             $query->where('user_id', auth()->id());
         }
-
-
 
 
         if (auth()->user()->hasRole('teknisi')) {
