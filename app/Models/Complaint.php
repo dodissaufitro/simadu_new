@@ -28,8 +28,8 @@ class Complaint extends Model
 
             if (auth()->check() && auth()->user()->hasRole('super_admin')) {
                 $user = User::find($complaint->user_id);
-                $complaint->unit_id = $user?->unit_id;
-                $complaint->tower_id = $user?->tower_id;
+                $complaint->unit_id = $user?->unit_id ?? 1;
+                $complaint->tower_id = $user?->tower_id ?? 1;
             }
 
 
