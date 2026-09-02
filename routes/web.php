@@ -22,20 +22,28 @@ Route::get('/fix-image-cpanel', function () {
     $linkFolder = $_SERVER['DOCUMENT_ROOT'] . '/storage';
     
     try {
-        // Jika folder storage sudah ada (tapi bukan symlink) atau symlink rusak, hapus dulu!
         if (file_exists($linkFolder) || is_link($linkFolder)) {
-            // Pada Windows jalankan rmdir, pada Linux hapus link
             if (is_link($linkFolder)) {
                 unlink($linkFolder);
             } else {
-                // Jangan pakai rmdir rekursif dari web untuk keamanan, asumsikan kosong atau ubah nama
                 rename($linkFolder, $_SERVER['DOCUMENT_ROOT'] . '/storage_backup_' . time());
             }
         }
-        
         symlink($targetFolder, $linkFolder);
         return 'Sukses: Symlink manual berhasil dipaksa (Forced) dibuat di ' . $linkFolder . '<br>Silakan upload ulang gambarnya jika masih tidak muncul.';
     } catch (\Exception $e) {
         return 'Gagal: ' . $e->getMessage();
     }
 });
+
+// ROUTE ALTERNATIF: Melayani gambar langsung via PHP (Tanpa Symlink)
+// Jika Symlink diblokir oleh hosting, route ini akan mengambil alih dan menampilkan gambar secara paksa dari folder storage lokal.
+Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+    $path = storage_path('app/public/' . $folder . '/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->where('filename', '.*');
