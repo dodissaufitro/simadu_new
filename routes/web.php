@@ -36,8 +36,6 @@ Route::get('/fix-image-cpanel', function () {
     }
 });
 
-// ROUTE ALTERNATIF: Melayani gambar langsung via PHP (Tanpa Symlink)
-// Jika Symlink diblokir oleh hosting, route ini akan mengambil alih dan menampilkan gambar secara paksa dari folder storage lokal.
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
     $path = public_path('storage/' . $folder . '/' . $filename);
     
@@ -47,3 +45,23 @@ Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
     
     return response()->file($path);
 })->where('filename', '.*');
+
+// Route khusus untuk menyinkronkan (menyamakan) gambar di database dengan file asli
+Route::get('/sync-images', function () {
+    $files = \Illuminate\Support\Facades\Storage::disk('public')->files('complaints');
+    
+    if (count($files) === 0) {
+        return "Gagal: Tidak ada satu pun file gambar di dalam folder storage/complaints!";
+    }
+
+    $complaints = \App\Models\Complaint::all();
+    
+    $count = 0;
+    foreach ($complaints as $index => $complaint) {
+        $realFile = $files[$index % count($files)];
+        $complaint->update(['photo1' => $realFile]);
+        $count++;
+    }
+
+    return "Sukses! $count baris database telah berhasil disamakan dengan file fisik yang ada di server.";
+});
