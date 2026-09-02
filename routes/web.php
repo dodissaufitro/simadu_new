@@ -39,7 +39,7 @@ Route::get('/fix-image-cpanel', function () {
 // ROUTE ALTERNATIF: Melayani gambar langsung via PHP (Tanpa Symlink)
 // Jika Symlink diblokir oleh hosting, route ini akan mengambil alih dan menampilkan gambar secara paksa dari folder storage lokal.
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    $path = storage_path('app/public/' . $folder . '/' . $filename);
+    $path = public_path('storage/' . $folder . '/' . $filename);
     
     if (!file_exists($path)) {
         abort(404);
