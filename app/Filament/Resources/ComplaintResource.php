@@ -198,6 +198,7 @@ class ComplaintResource extends Resource
                     ->wrap(),
                 Tables\Columns\ImageColumn::make('photo1')
                     ->label('Photo')
+                    ->disk('public')
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('user.name')
