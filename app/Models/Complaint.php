@@ -21,16 +21,15 @@ class Complaint extends Model
 
         static::creating(function ($complaint) {
             if (auth()->check() && auth()->user()->hasRole('user')) {
-                $complaint->unit_id = auth()->user()->unit->id;
-                $complaint->tower_id = auth()->user()->tower->id;
+                $complaint->unit_id = auth()->user()->unit_id;
+                $complaint->tower_id = auth()->user()->tower_id;
                 $complaint->user_id = auth()->user()->id;
             }
 
             if (auth()->check() && auth()->user()->hasRole('super_admin')) {
-                // $complaint->user_id = auth()->user()->id;
                 $user = User::find($complaint->user_id);
-                // dd($user->unit_id);
-                $complaint->unit_id = $user->unit_id;
+                $complaint->unit_id = $user?->unit_id;
+                $complaint->tower_id = $user?->tower_id;
             }
 
 

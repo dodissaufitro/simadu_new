@@ -44,7 +44,7 @@ class ComplaintResource extends Resource
             return (string) Complaint::where('status', 'finish')->where('user_id', auth()->user()->id)->count();
         }
         if (Auth::user()->hasRole('koordinator')) {
-            return (string) Complaint::where('status', 'request')->where('tower_id', '=', auth()->user()->tower->id)->count();
+            return (string) Complaint::where('status', 'request')->where('tower_id', '=', auth()->user()->tower_id)->count();
         }
 
         return (string) Complaint::where('status', 'request')->count();
@@ -97,6 +97,10 @@ class ComplaintResource extends Resource
                     ->default(now())
                     ->hidden(auth()->user()->hasRole('user'))
                     ->placeholder('Tanggal Eksekusi'),
+                Forms\Components\DatePicker::make('created_at')
+                    ->label('Tanggal Complaint')
+                    ->default(now())
+                    ->required(),
                 Forms\Components\Textarea::make('complaint')
                     ->required()
                     ->columnSpanFull()
@@ -183,7 +187,7 @@ class ComplaintResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Complaint')
-                    ->dateTime()
+                    ->date('d M Y')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('complaint')
@@ -219,6 +223,8 @@ class ComplaintResource extends Resource
                         'pending' => 'warning',
                         'proses' => 'info',
                         'deny' => 'danger',
+                        're-schedule' => 'warning',
+                        default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('tanggal_eksekusi')
                     ->date()
@@ -251,7 +257,19 @@ class ComplaintResource extends Resource
                     ->button()
 
                     ->hidden(function (?Complaint $record) {
-                        return !auth()->user()->hasRole('teknisi') || $record->status == "finish" || $record->status == "completed" || $record->status == "request" ||  $record->status == "denied";
+                         if (!auth()->user()->hasRole('teknisi')) {
+                            return true;
+                        }
+                        
+                        $isAssigned = $record->TeknisiOnComplaint()
+                            ->where('teknisi_id', auth()->user()->id)
+                            ->exists();
+
+                        if (!$isAssigned) {
+                            return true;
+                        }
+
+                        return in_array($record->status, ["finish", "completed", "request", "denied"]);
                     })
                     ->modalHeading('Confirmasi Teknisi')
                     ->modalSubheading('Update informasi kamu.')
