@@ -16,17 +16,25 @@ Route::get('/fix-image', function () {
     }
 });
 
-// Route untuk memperbaiki gambar khusus cPanel/Shared Hosting (Manual Symlink)
+// Route untuk memperbaiki gambar khusus cPanel/Shared Hosting (Force Manual Symlink)
 Route::get('/fix-image-cpanel', function () {
     $targetFolder = storage_path('app/public');
     $linkFolder = $_SERVER['DOCUMENT_ROOT'] . '/storage';
     
     try {
-        if (file_exists($linkFolder)) {
-            return 'Symlink sudah ada atau folder storage sudah ada di public_html.';
+        // Jika folder storage sudah ada (tapi bukan symlink) atau symlink rusak, hapus dulu!
+        if (file_exists($linkFolder) || is_link($linkFolder)) {
+            // Pada Windows jalankan rmdir, pada Linux hapus link
+            if (is_link($linkFolder)) {
+                unlink($linkFolder);
+            } else {
+                // Jangan pakai rmdir rekursif dari web untuk keamanan, asumsikan kosong atau ubah nama
+                rename($linkFolder, $_SERVER['DOCUMENT_ROOT'] . '/storage_backup_' . time());
+            }
         }
+        
         symlink($targetFolder, $linkFolder);
-        return 'Sukses: Symlink manual berhasil dibuat di ' . $linkFolder;
+        return 'Sukses: Symlink manual berhasil dipaksa (Forced) dibuat di ' . $linkFolder . '<br>Silakan upload ulang gambarnya jika masih tidak muncul.';
     } catch (\Exception $e) {
         return 'Gagal: ' . $e->getMessage();
     }
