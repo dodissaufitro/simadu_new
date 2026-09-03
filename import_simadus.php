@@ -32,10 +32,8 @@ foreach ($tables as $table) {
     // 2. Tulis ke file Seeder
     $seederCode .= "        DB::table('{$table}')->truncate();\n";
     if (!empty($insertData)) {
-        // Menggunakan var_export atau json agar rapi. JSON lebih aman untuk teks panjang/kutipan.
-        $json = json_encode($insertData, JSON_UNESCAPED_UNICODE);
-        $escapedJson = addslashes($json);
-        $seederCode .= "        \$data_{$table} = json_decode('{$escapedJson}', true);\n";
+        $arrayExport = var_export($insertData, true);
+        $seederCode .= "        \$data_{$table} = {$arrayExport};\n";
         $seederCode .= "        foreach (array_chunk(\$data_{$table}, 50) as \$chunk) {\n            DB::table('{$table}')->insert(\$chunk);\n        }\n";
     }
 }
