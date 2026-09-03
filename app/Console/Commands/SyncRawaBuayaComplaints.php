@@ -29,14 +29,10 @@ class SyncRawaBuayaComplaints extends Command
             return;
         }
 
-        if ($this->option('fresh')) {
-            $this->info("Menghapus data keluhan lama dari database...");
-            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            Complaint::truncate();
-            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        } else {
-            $this->info("Mode append (menambah data). Data lama tidak dihapus.");
-        }
+        $this->info("Menghapus data keluhan lama dari database...");
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Complaint::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->info("Membaca data text dari Excel (Semua Sheet)...");
         $reader = IOFactory::createReader('Xlsx');
