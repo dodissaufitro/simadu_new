@@ -41,6 +41,27 @@ class ImportComplaintsExcel extends Command
             return;
         }
 
+        // --- CLEANUP DATA & GAMBAR LAMA ---
+        $this->info("Menghapus data keluhan lama dari database...");
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \App\Models\Complaint::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        $this->info("Membersihkan gambar lama dari direktori...");
+        $complaintsPath = storage_path('app/public/complaints');
+        if (\Illuminate\Support\Facades\File::exists($complaintsPath)) {
+            $files = \Illuminate\Support\Facades\File::files($complaintsPath);
+            foreach ($files as $f) {
+                // Hapus semua file KECUALI placeholder.jpg
+                if ($f->getFilename() !== 'placeholder.jpg') {
+                    \Illuminate\Support\Facades\File::delete($f->getPathname());
+                }
+            }
+        } else {
+            \Illuminate\Support\Facades\File::makeDirectory($complaintsPath, 0755, true);
+        }
+        $this->info("Gambar lama berhasil dihapus.");
+
         $this->info("Loading Excel file...");
         $spreadsheet = IOFactory::load($file);
 
