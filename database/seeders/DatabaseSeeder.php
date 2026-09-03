@@ -41,6 +41,8 @@ class DatabaseSeeder extends Seeder
         // Complaint::factory(20)->create();
         // Penilaian::factory(20)->create();
 
+        $this->call(UserSeeder::class);
+
 
     }
 }

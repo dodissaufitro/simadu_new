@@ -17,7 +17,7 @@ class LantaiFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->numberBetween(1, 20),
+            'name' => $this->faker->unique()->numberBetween(1, 10000),
             'tower_id' => $this->faker->numberBetween(1, 10),
         ];
     }
