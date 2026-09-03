@@ -166,6 +166,7 @@ class ImportComplaintsExcel extends Command
     private function extractAndSaveDrawing($drawingsMap, $coordinate)
     {
         if (!isset($drawingsMap[$coordinate])) {
+            $this->warn("Gambar tidak ditemukan pada koordinat: $coordinate");
             return null;
         }
 
@@ -182,26 +183,45 @@ class ImportComplaintsExcel extends Command
         $fullPath = storage_path('app/' . $path);
 
         if (!is_dir(dirname($fullPath))) {
-            mkdir(dirname($fullPath), 0755, true);
+            if (!@mkdir(dirname($fullPath), 0755, true)) {
+                $this->error("Gagal membuat direktori untuk gambar. Periksa permission!");
+                return null;
+            }
         }
 
         if ($drawing instanceof MemoryDrawing) {
+            $renderFunc = $drawing->getRenderingFunction();
+            if (!function_exists($renderFunc)) {
+                $this->error("Fungsi $renderFunc tidak ditemukan. Pastikan ekstensi php-gd aktif di server Linux Anda!");
+                return null;
+            }
             ob_start();
             call_user_func(
-                $drawing->getRenderingFunction(),
+                $renderFunc,
                 $drawing->getImageResource()
             );
             $imageContents = ob_get_contents();
             ob_end_clean();
-            file_put_contents($fullPath, $imageContents);
+            if (file_put_contents($fullPath, $imageContents) === false) {
+                $this->error("Gagal menyimpan gambar di MemoryDrawing. Periksa write permission!");
+                return null;
+            }
         } elseif ($drawing instanceof Drawing) {
             $zipReader = fopen($drawing->getPath(), 'r');
             $imageContents = '';
-            while (!feof($zipReader)) {
-                $imageContents .= fread($zipReader, 1024);
+            if ($zipReader) {
+                while (!feof($zipReader)) {
+                    $imageContents .= fread($zipReader, 1024);
+                }
+                fclose($zipReader);
+                if (file_put_contents($fullPath, $imageContents) === false) {
+                    $this->error("Gagal menyimpan gambar di Drawing. Periksa write permission!");
+                    return null;
+                }
+            } else {
+                $this->error("Gagal membaca file zip internal Drawing.");
+                return null;
             }
-            fclose($zipReader);
-            file_put_contents($fullPath, $imageContents);
         } else {
             return null;
         }

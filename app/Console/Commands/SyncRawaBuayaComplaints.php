@@ -59,9 +59,21 @@ class SyncRawaBuayaComplaints extends Command
 
         $this->info("Membaca dan memetakan gambar dari file ZIP (Excel)...");
         $zip = new ZipArchive;
-        if ($zip->open($inputFileName) === TRUE) {
+        $openResult = $zip->open($inputFileName);
+        if ($openResult === TRUE) {
+            $this->info("ZIP berhasil dibuka, memproses gambar...");
+            // Create a case-insensitive file map
+            $zipFiles = [];
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $stat = $zip->statIndex($i);
+                if ($stat) {
+                    $zipFiles[strtolower($stat['name'])] = $stat['name'];
+                }
+            }
+
             // 1. Map rId to sheet path from workbook rels
-            $workbookRelsXml = $zip->getFromName('xl/_rels/workbook.xml.rels');
+            $realWorkbookRels = $zipFiles[strtolower('xl/_rels/workbook.xml.rels')] ?? 'xl/_rels/workbook.xml.rels';
+            $workbookRelsXml = $zip->getFromName($realWorkbookRels);
             $workbookRelsDoc = new DOMDocument();
             if ($workbookRelsXml) {
                 $workbookRelsDoc->loadXML($workbookRelsXml);
@@ -72,7 +84,8 @@ class SyncRawaBuayaComplaints extends Command
             }
 
             // 2. Read workbook.xml to get sheet names in order
-            $workbookXml = $zip->getFromName('xl/workbook.xml');
+            $realWorkbookXml = $zipFiles[strtolower('xl/workbook.xml')] ?? 'xl/workbook.xml';
+            $workbookXml = $zip->getFromName($realWorkbookXml);
             $workbookDoc = new DOMDocument();
             $sheetMappings = [];
             if ($workbookXml) {
@@ -84,7 +97,8 @@ class SyncRawaBuayaComplaints extends Command
                     
                     // 3. Find drawing path from sheet rels
                     $sheetRelsPath = dirname($sheetPath) . '/_rels/' . basename($sheetPath) . '.rels';
-                    $sheetRelsXml = $zip->getFromName($sheetRelsPath);
+                    $realSheetRelsPath = $zipFiles[strtolower($sheetRelsPath)] ?? $sheetRelsPath;
+                    $sheetRelsXml = $zip->getFromName($realSheetRelsPath);
                     $drawingPath = null;
                     if ($sheetRelsXml) {
                         $sheetRelsDoc = new DOMDocument();
@@ -105,11 +119,13 @@ class SyncRawaBuayaComplaints extends Command
                 
                 $drawingPath = $sheetMappings[$sheetName] ?? null;
                 if ($drawingPath) {
-                    $drawingXml = $zip->getFromName($drawingPath);
+                    $realDrawingPath = $zipFiles[strtolower($drawingPath)] ?? $drawingPath;
+                    $drawingXml = $zip->getFromName($realDrawingPath);
                     if ($drawingXml) {
                         // get drawing rels
                         $drawingRelsPath = 'xl/drawings/_rels/' . basename($drawingPath) . '.rels';
-                        $drawingRelsXml = $zip->getFromName($drawingRelsPath);
+                        $realDrawingRelsPath = $zipFiles[strtolower($drawingRelsPath)] ?? $drawingRelsPath;
+                        $drawingRelsXml = $zip->getFromName($realDrawingRelsPath);
                         $rels = [];
                         if ($drawingRelsXml) {
                             $drawingRelsDoc = new DOMDocument();
@@ -135,27 +151,39 @@ class SyncRawaBuayaComplaints extends Command
                                     
                                     if (isset($rowsData[$row])) {
                                         // Extract image to storage
-                                        $imageContent = $zip->getFromName($imagePath);
+                                        $realImagePath = $zipFiles[strtolower($imagePath)] ?? $imagePath;
+                                        $imageContent = $zip->getFromName($realImagePath);
                                         if ($imageContent) {
                                             $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
                                             $filename = uniqid('rawabuaya_') . '.' . $extension;
                                             $storagePath = 'public/complaints/' . $filename;
                                             
                                             if (!is_dir(storage_path('app/public/complaints'))) {
-                                                mkdir(storage_path('app/public/complaints'), 0755, true);
+                                                if (!@mkdir(storage_path('app/public/complaints'), 0755, true)) {
+                                                    $this->error("Gagal membuat direktori storage/app/public/complaints. Periksa permission!");
+                                                }
                                             }
                                             
-                                            file_put_contents(storage_path('app/' . $storagePath), $imageContent);
-                                            $rowsData[$row]['images'][] = 'complaints/' . $filename;
+                                            if (file_put_contents(storage_path('app/' . $storagePath), $imageContent) === false) {
+                                                $this->error("Gagal menyimpan gambar $filename. Periksa write permission!");
+                                            } else {
+                                                $rowsData[$row]['images'][] = 'complaints/' . $filename;
+                                            }
+                                        } else {
+                                            $this->warn("Konten gambar kosong atau gagal diekstrak: $imagePath");
                                         }
                                     }
                                 }
                             }
                         }
+                    } else {
+                        $this->warn("Gagal membaca drawing XML: $drawingPath");
                     }
                 }
             }
             $zip->close();
+        } else {
+            $this->error("Gagal membuka file Excel sebagai ZIP. Kode Error: " . $openResult . ". Pastikan ekstensi php-zip aktif di server Linux Anda.");
         }
 
         $totalData = 0;
