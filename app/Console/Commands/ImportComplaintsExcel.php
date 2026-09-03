@@ -49,6 +49,13 @@ class ImportComplaintsExcel extends Command
             $user = User::first(); // Fallback
         }
 
+        // Pastikan ada Rusun default agar relasi Tower tidak error di Production
+        $defaultRusun = \App\Models\Rusun::firstOrCreate(
+            ['name' => 'Rusun Default'],
+            ['address' => 'Jakarta']
+        );
+        $defaultRusunId = $defaultRusun->id;
+
         foreach ($spreadsheet->getAllSheets() as $worksheet) {
             $this->info("Processing sheet: " . $worksheet->getTitle());
             $rows = $worksheet->toArray();
@@ -81,7 +88,7 @@ class ImportComplaintsExcel extends Command
                         $lantaiName = $parts[1];
                         $unitName = $parts[2];
 
-                        $tower = Tower::firstOrCreate(['name' => $towerName], ['rusun_id' => 1]); // default rusun_id 1
+                        $tower = Tower::firstOrCreate(['name' => $towerName], ['rusun_id' => $defaultRusunId]); // default rusun_id
                         $lantai = lantai::firstOrCreate(['name' => $lantaiName, 'tower_id' => $tower->id]);
                         $unit = Unit::firstOrCreate(['name' => $unitName, 'lantai_id' => $lantai->id]);
 
