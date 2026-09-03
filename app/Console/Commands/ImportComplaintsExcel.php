@@ -46,7 +46,20 @@ class ImportComplaintsExcel extends Command
 
         $user = User::where('email', 'user@example.com')->first();
         if (!$user) {
-            $user = User::first(); // Fallback
+            $user = User::first(); 
+        }
+
+        // Jika tabel User benar-benar kosong (karena migrate:fresh dan belum di-seed)
+        if (!$user) {
+            $this->info("Tabel user kosong. Membuat user dummy otomatis...");
+            $user = User::create([
+                'name' => 'Default User',
+                'email' => 'user@example.com',
+                'password' => bcrypt('password'),
+                // Jika butuh tower_id, unit_id, lantai_id, sesuaikan dengan logic. 
+                // Untuk tahap ini biarkan nullable jika migration mengizinkan, 
+                // atau diisi dengan ID 1 jika terpaksa.
+            ]);
         }
 
         // Pastikan ada Rusun default agar relasi Tower tidak error di Production
