@@ -137,10 +137,16 @@ class ImportComplaintsExcel extends Command
 
                 $tanggalLaporan = !empty($row[5]) ? $this->parseDate($row[5]) : now();
 
-                Complaint::create([
+                // Fetch the specific users based on email
+                $penghuniId = \App\Models\User::where('email', 'penghuni@gmail.com')->value('id') ?? 1;
+                $koorId = \App\Models\User::where('email', 'koordinator@gmail.com')->value('id');
+                $techId = \App\Models\User::where('email', 'teknisi@gmail.com')->value('id');
+
+                $complaintObj = Complaint::create([
                     'tower_id' => $towerId ?? 1, // Fallback if format is different
                     'unit_id' => $unitId ?? 1,   // Fallback
-                    'user_id' => $user ? $user->id : 1,
+                    'user_id' => $penghuniId,
+                    'koor_id' => $koorId,
                     'complaint' => $kerusakan ?? '-',
                     'photo1' => $photo1Path ?? 'complaints/placeholder.jpg', // use placeholder
                     'photo2' => $photo2Path,
@@ -148,6 +154,13 @@ class ImportComplaintsExcel extends Command
                     'created_at' => $tanggalLaporan,
                     'updated_at' => $tanggalLaporan,
                 ]);
+
+                if ($techId) {
+                    \App\Models\TeknisiOnComplaint::create([
+                        'complaint_id' => $complaintObj->id,
+                        'teknisi_id' => $techId,
+                    ]);
+                }
             }
         }
         

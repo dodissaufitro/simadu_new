@@ -224,12 +224,13 @@ class PenilaianResource extends Resource
             $query->where('user_id', auth()->user()->id); // Hanya data yang dimiliki user yang login
         }
         if (auth()->user()->hasRole('koordinator')) {
-            $query->where(function ($query) {
+            $rusunId = auth()->user()->rusun_id;
+            $query->where(function ($query) use ($rusunId) {
                 $query->where('user_id', auth()->user()->id)
-                    ->orWhereIn('user_id', function ($subquery) {
+                    ->orWhereIn('user_id', function ($subquery) use ($rusunId) {
                         $subquery->select('id')
                             ->from('users')
-                            ->where('tower_id', auth()->user()->tower_id);
+                            ->where('rusun_id', $rusunId);
                     });
             });
         }

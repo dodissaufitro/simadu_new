@@ -268,10 +268,16 @@ class SyncRawaBuayaComplaints extends Command
                 $photo2 = isset($images[1]) ? $images[1] : null;
                 $photo3 = isset($images[2]) ? $images[2] : null;
 
-                Complaint::create([
+                // Fetch the specific users based on email
+                $penghuniId = \App\Models\User::where('email', 'penghuni@gmail.com')->value('id') ?? $user->id;
+                $koorId = \App\Models\User::where('email', 'koordinator@gmail.com')->value('id');
+                $techId = \App\Models\User::where('email', 'teknisi@gmail.com')->value('id');
+
+                $complaintObj = Complaint::create([
                     'tower_id' => $tower->id,
                     'unit_id' => $unit->id,
-                    'user_id' => $user->id,
+                    'user_id' => $penghuniId,
+                    'koor_id' => $koorId,
                     'complaint' => $data['kerusakan'] ?? '-',
                     'photo1' => $photo1,
                     'photo2' => $photo2,
@@ -281,6 +287,14 @@ class SyncRawaBuayaComplaints extends Command
                     'created_at' => $tanggalLaporan,
                     'updated_at' => $tanggalLaporan,
                 ]);
+
+                if ($techId) {
+                    \App\Models\TeknisiOnComplaint::create([
+                        'complaint_id' => $complaintObj->id,
+                        'teknisi_id' => $techId,
+                        'status' => 'accept',
+                    ]);
+                }
                 $imported++;
             }
         }

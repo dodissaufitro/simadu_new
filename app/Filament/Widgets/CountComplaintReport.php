@@ -79,32 +79,35 @@ class CountComplaintReport extends BaseWidget
         ];
         }
         if(Auth::user()->hasRole('koordinator')){
+            $rusunId = auth()->user()->rusun_id;
+            $towerIds = \App\Models\Tower::where('rusun_id', $rusunId)->pluck('id')->toArray();
+
             return [
-            Stat::make('Complaint Report', Complaint::where('tower_id', auth()->user()->tower_id)->count())
+            Stat::make('Complaint Report', Complaint::whereIn('tower_id', $towerIds)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Accepted', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','accept')->count())
+            Stat::make('Complaint Accepted', Complaint::whereIn('tower_id', $towerIds)->where('status','accept')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','completed')->count())
+            Stat::make('Complaint Finish', Complaint::whereIn('tower_id', $towerIds)->where('status','completed')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Pending', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','pending')->count())
+            Stat::make('Pending', Complaint::whereIn('tower_id', $towerIds)->where('status','pending')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Denied', Complaint::where('tower_id', auth()->user()->tower_id)->where('status','denied')->count())
+            Stat::make('Denied', Complaint::whereIn('tower_id', $towerIds)->where('status','denied')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('User', User::where('tower_id',auth()->user()->tower_id)->count())
+            Stat::make('User', User::where('rusun_id', $rusunId)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Feedback', Penilaian::where('tower_id', auth()->user()->tower_id)->count())
+            Stat::make('Feedback', Penilaian::whereIn('tower_id', $towerIds)->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),

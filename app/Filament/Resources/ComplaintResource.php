@@ -44,7 +44,9 @@ class ComplaintResource extends Resource
             return (string) Complaint::where('status', 'finish')->where('user_id', auth()->user()->id)->count();
         }
         if (Auth::user()->hasRole('koordinator')) {
-            return (string) Complaint::where('status', 'request')->where('tower_id', '=', auth()->user()->tower_id)->count();
+            $rusunId = auth()->user()->rusun_id;
+            $towerIds = \App\Models\Tower::where('rusun_id', $rusunId)->pluck('id')->toArray();
+            return (string) Complaint::where('status', 'request')->whereIn('tower_id', $towerIds)->count();
         }
 
         return (string) Complaint::where('status', 'request')->count();
@@ -490,10 +492,11 @@ class ComplaintResource extends Resource
         }
 
         if (auth()->user()->hasRole('koordinator')) {
+            $rusunId = auth()->user()->rusun_id;
 
             $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')
                 ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-                ->where('towers.id', auth()->user()->tower_id)
+                ->where('towers.rusun_id', $rusunId)
                 ->select('complaints.*', 'users.name as user_name', 'towers.id as tower_id');
         }
 
