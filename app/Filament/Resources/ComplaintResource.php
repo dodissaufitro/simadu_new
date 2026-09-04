@@ -493,11 +493,9 @@ class ComplaintResource extends Resource
 
         if (auth()->user()->hasRole('koordinator')) {
             $rusunId = auth()->user()->rusun_id;
-
-            $query->leftJoin('users', 'complaints.user_id', '=', 'users.id')
-                ->leftJoin('towers', 'users.tower_id', '=', 'towers.id')
-                ->where('towers.rusun_id', $rusunId)
-                ->select('complaints.*', 'users.name as user_name', 'towers.id as tower_id');
+            $towerIds = \App\Models\Tower::where('rusun_id', $rusunId)->pluck('id')->toArray();
+            
+            $query->whereIn('complaints.tower_id', $towerIds);
         }
 
 

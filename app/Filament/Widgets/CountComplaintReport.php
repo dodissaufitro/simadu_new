@@ -91,7 +91,7 @@ class CountComplaintReport extends BaseWidget
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
-            Stat::make('Complaint Finish', Complaint::whereIn('tower_id', $towerIds)->where('status','completed')->count())
+            Stat::make('Complaint Finish', Complaint::whereIn('tower_id', $towerIds)->where('status','finish')->count())
                 ->extraAttributes(['class' => 'text-center '])
                 ->icon('heroicon-o-user')
                 ->color('red'),
